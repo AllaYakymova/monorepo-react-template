@@ -29,8 +29,8 @@ jobs:
     # 4. Генерация CHANGELOG для каждого пакета с помощью Lerna
     - name: Generate Changelogs
       run: |
-        # npx lerna version --conventional-commits --yes --no-push
-        npm run changelog:all
+        npx lerna version --conventional-commits --yes --no-push
+        # npm run changelog:all
         git add .
       env:
         GIT_AUTHOR_NAME: "Alla Yakymova"
