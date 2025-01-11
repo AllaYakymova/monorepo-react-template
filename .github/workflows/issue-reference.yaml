@@ -15,6 +15,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install dependencies
+      run: |
+        npm install @octokit/rest
+    
     - name: Extract branch name
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
