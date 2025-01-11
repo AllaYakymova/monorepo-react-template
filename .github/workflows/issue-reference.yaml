@@ -19,6 +19,8 @@ jobs:
       run: |
         BRANCH_NAME=${GITHUB_REF_NAME}
         ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
+        echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+        echo "GITHUB_REF: $GITHUB_REF"
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
 
