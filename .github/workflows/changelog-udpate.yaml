@@ -27,10 +27,10 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Ensure repository is correctly linked
-      run: |
-        git remote add origin https://github.com/${{ github.repository }}.git
-        git fetch origin
+    # - name: Ensure repository is correctly linked
+    #   run: |
+    #     git remote add origin https://github.com/${{ github.repository }}.git
+    #     git fetch origin
 
     # 3. Установка зависимостей
     - name: Install dependencies
