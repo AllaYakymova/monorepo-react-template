@@ -1,0 +1,41 @@
+name: Create Issue Reference in PR Template
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  update-template:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Extract issue number from branch name
+      run: |
+        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+        ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
+        echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
+        echo "ISSUE_NUMBER =====> ${env.ISSUE_NUMBER}"
+
+    - name: Update pull request template
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          console.log("process.env.GITHUB_WORKSPACE is: ", process.env.GITHUB_WORKSPACE)
+          const templatePath = path.join(process.env.GITHUB_WORKSPACE, '.github/pull_request_template.md');
+          const templateContent = fs.readFileSync(templatePath, 'utf8');
+
+          # const issueLink = `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${process.env.ISSUE_NUMBER}`;
+
+          const issueLink = `https://github.com/issues/${process.env.ISSUE_NUMBER}`;
+          const updatedContent = templateContent.replace('<!-- ISSUE_LINK -->', `[Issue #${process.env.ISSUE_NUMBER}](${issueLink})`);
+
+          fs.writeFileSync(templatePath, updatedContent);
