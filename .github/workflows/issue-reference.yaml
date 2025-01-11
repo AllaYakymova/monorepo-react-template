@@ -29,9 +29,12 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
+          const fs = require('fs');
           const issueNumber = process.env.ISSUE_NUMBER;
           const issueLink = `https://github.com/issues/${issueNumber}`;
           const prNumber = process.env.GITHUB_REF.split('/')[2]; // Получить номер PR из GITHUB_REF
+          // Добавляем переменную окружения в файл GITHUB_ENV
+          fs.appendFileSync(process.env.GITHUB_ENV, `PR_NUMBER=${prNumber}\n`);
           
           // Получаем существующее описание PR
           const { data: pullRequest } = await github.pulls.get({
@@ -39,6 +42,8 @@ jobs:
             repo: context.repo.repo,
             pull_number: prNumber,
           });
+
+          fs.appendFileSync(process.env.GITHUB_ENV, `PR_DATA=${ppullRequest}\n`);
 
           const updatedBody = pullRequest.body.replace(
             '<!-- ISSUE_LINK -->',
@@ -52,18 +57,3 @@ jobs:
             pull_number: prNumber,
             body: updatedBody,
           });
-
-          # const fs = require('fs');
-          # const path = require('path');
-          # console.log("process.env.GITHUB_WORKSPACE is: ", process.env.GITHUB_WORKSPACE)
-          # const templatePath = path.join(process.env.GITHUB_WORKSPACE, '.github/pull_request_template.md');
-          # const templateContent = fs.readFileSync(templatePath, 'utf8');
-
-          # /*
-          # const issueLink = `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${process.env.ISSUE_NUMBER}`;
-          # */
-
-          # const issueLink = `https://github.com/issues/${process.env.ISSUE_NUMBER}`;
-          # const updatedContent = templateContent.replace('<!-- ISSUE_LINK -->', `[Issue #${process.env.ISSUE_NUMBER}](${issueLink})`);
-
-          # fs.writeFileSync(templatePath, updatedContent);
