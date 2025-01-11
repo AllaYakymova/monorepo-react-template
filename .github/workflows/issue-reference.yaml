@@ -2,7 +2,7 @@ name: Create Issue Reference in PR Template
 
 on:
   pull_request:
-    types: [opened, edited]
+    types: [opened, edited, synchronize]
 
 jobs:
   update-template:
@@ -15,27 +15,61 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Extract issue number from branch name
+    - name: Extract branch name
       run: |
-        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+        BRANCH_NAME="${GITHUB_HEAD_REF}"
         ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
-        echo "ISSUE_NUMBER =====> ${env.ISSUE_NUMBER}"
 
     - name: Update pull request template
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ env.GITHUB_TOKEN }}
         script: |
-          const fs = require('fs');
-          const path = require('path');
-          console.log("process.env.GITHUB_WORKSPACE is: ", process.env.GITHUB_WORKSPACE)
-          const templatePath = path.join(process.env.GITHUB_WORKSPACE, '.github/pull_request_template.md');
-          const templateContent = fs.readFileSync(templatePath, 'utf8');
+          // get issue number, link and PR number from context
+          const issueNumber = process.env.ISSUE_NUMBER;
+          const prNumber = context.payload.pull_request.number;
+          const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
+          const token = process.env.GITHUB_TOKEN;
 
-          # const issueLink = `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${process.env.ISSUE_NUMBER}`;
+          console.log('PR Context: ', context)
 
-          const issueLink = `https://github.com/issues/${process.env.ISSUE_NUMBER}`;
-          const updatedContent = templateContent.replace('<!-- ISSUE_LINK -->', `[Issue #${process.env.ISSUE_NUMBER}](${issueLink})`);
+          // get PR body
+          const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
+          const prResponse = await fetch(prUrl, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+            },
+          });
 
-          fs.writeFileSync(templatePath, updatedContent);
+          if (!prResponse.ok) {
+            throw new Error(`Failed to fetch PR: ${prResponse.statusText}`);
+          }
+
+          const pullRequest = await prResponse.json();
+
+          // Uodate PR body
+          const updatedBody = pullRequest.body.replace(
+            '<!-- ISSUE_LINK -->',
+            `[#${issueNumber}](${issueLink})`
+          );
+
+          // Отправляем обновленное описание PR
+          const updatePrResponse = await fetch(prUrl, {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ body: updatedBody }),
+          });
+
+          if (!updatePrResponse.ok) {
+            throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
+          }
+
+          console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
