@@ -19,7 +19,7 @@ module.exports = {
         commitGroupsSort: 'title', // Сортировка групп в CHANGELOG
         commitsSort: ['scope', 'subject'], // Сортировка коммитов внутри группы
         noteGroupsSort: 'title', // Сортировка заметок (breaking changes и т.д.)
-        commitPartial: "- {{ #if this.subject }}{ { this.subject } } { {/if } } \n",
+        commitPartial: "- {{#if this.subject}}{{this.subject}}{{/if}}\n",
         // Шаблон для каждой записи коммита
         // commitPartial: `- {{#if this.scope}}**{{this.scope}}:** {{/if}}{{this.subject}}\n`,
 
@@ -38,5 +38,8 @@ module.exports = {
 
         // Шаблон для групп в CHANGELOG.md
         groupByPartial: `### {{title}}\n\n{{commits}}\n`,
+
+        // Переопределение заголовка версии
+        // headerPartial: '',
     },
 }
