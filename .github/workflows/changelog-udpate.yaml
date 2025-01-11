@@ -82,7 +82,7 @@ jobs:
           if (commands.length === 0) {
             console.log('No matching packages found in commit message.');
           }
-          console.log("CCCCCCCCommands: ", commands)
+          
           // Установить output с массивом команд как строку, разделенную ";"
           core.setOutput('commands', commands.join(' && '));
     
