@@ -89,33 +89,6 @@ jobs:
       #     commands="${{ steps.process-commit.outputs.commands }}"
       #     eval "$commands"
 
-      # - name: Generate Changelogs
-      #   uses: actions/github-script@v6
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       // Получить сообщение последнего коммита
-      #       COMMIT_MESSAGE=$(git log -1 --format=%B)
-
-      #       // Разбить сообщение на строки
-      #       while IFS= read -r line; do
-      #         // Извлечь название пакета из строки
-      #         PACKAGE=$(echo "$line" | grep -oP '\(\K[^)]+')
-              
-      #         if [ -n "$PACKAGE" ]; then
-      #           case $PACKAGE in
-      #             front-end)
-      #               npm run changelog:front-end
-      #               ;;
-      #             plugin-component)
-      #               npm run changelog:plugin-component
-      #               ;;
-      #             root)
-      #               npm run changelog:root
-      #               ;;
-      #           esac
-      #         fi
-      #       done <<< "$COMMIT_MESSAGE"
       # run: |
       #   # npx lerna version --conventional-commits --yes --no-push
       #   # npm run changelog:all
