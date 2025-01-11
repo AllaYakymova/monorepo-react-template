@@ -45,8 +45,8 @@ jobs:
 
     # 6. Коммит и пуш изменений
     - name: Commit and Push Changelog Updates
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      # with:
+      #   github-token: ${{ secrets.GITHUB_TOKEN }}
       run: |
         if git diff --cached --quiet; then
           echo "No changes detected, skipping commit."
