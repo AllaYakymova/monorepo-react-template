@@ -3,7 +3,7 @@ name: Generate Changelog with Lerna
 on:
   push:
     branches:
-      - master
+      # - master
 
 jobs:
   update-changelog:
@@ -39,12 +39,12 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          # Получить сообщение последнего коммита
+          // Получить сообщение последнего коммита
           COMMIT_MESSAGE=$(git log -1 --format=%B)
 
-          # Разбить сообщение на строки
+          // Разбить сообщение на строки
           while IFS= read -r line; do
-            # Извлечь название пакета из строки
+            // Извлечь название пакета из строки
             PACKAGE=$(echo "$line" | grep -oP '\(\K[^)]+')
             
             if [ -n "$PACKAGE" ]; then
