@@ -32,8 +32,11 @@ jobs:
           const fs = require('fs');
           const issueNumber = process.env.ISSUE_NUMBER;
           const issueLink = `https://github.com/issues/${issueNumber}`;
-          const prNumber = process.env.GITHUB_REF.split('/')[2]; // Получить номер PR из GITHUB_REF
-          // Добавляем переменную окружения в файл GITHUB_ENV
+          // Получаем номер PR из контекста
+          const prNumber = context.payload.pull_request.number;
+          
+          # onst prNumber = process.env.GITHUB_REF.split('/')[2]; // Получить номер PR из GITHUB_REF
+          # // Добавляем переменную окружения в файл GITHUB_ENV
           fs.appendFileSync(process.env.GITHUB_ENV, `PR_NUMBER=${prNumber}\n`);
           
           // Получаем существующее описание PR
