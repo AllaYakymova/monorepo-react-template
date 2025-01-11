@@ -70,36 +70,17 @@ jobs:
           if (commands.length === 0) {
             console.log('No matching packages found in commit message.');
           }
-
+          console.log("CCCCCCCCommands: ", commands)
           // Установить output с массивом команд как строку, разделенную ";"
           core.setOutput('commands', commands.join(' && '));
     
     - name: Add changelog details
       if: steps.process-commit.outputs.commands != ''
       run: |
-        npx lerna version --conventional-commits --yes --no-push
+        # npx lerna version --conventional-commits --yes --no-push
         commands="${{ steps.process-commit.outputs.commands }}"
         eval "$commands"
         git add .
-
-    # if: steps.process-commit.outputs.commands != ''
-    #  run: |
-    #    npx lerna version --conventional-commits --yes --no-push
-    #    commands="${{ steps.process-commit.outputs.commands }}"
-    #    eval "$commands"
-    #    git add .
-
-      # - name: Run Commands in Bash
-      #   if: steps.process-commit.outputs.commands != ''
-      #   run: |
-      #     echo "Running commands..."
-      #     commands="${{ steps.process-commit.outputs.commands }}"
-      #     eval "$commands"
-
-      # run: |
-      #   # npx lerna version --conventional-commits --yes --no-push
-      #   # npm run changelog:all
-      #   git add . 
 
     - name: Set up GitHub authentication
       env:
