@@ -8,14 +8,17 @@ on:
 jobs:
   update-changelog:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - front-end
+          - plugin-component
+        - root
+
     permissions:
       contents: write
 
     steps:
-    # - name: Set working directory
-    #   run: |
-    #     cd monorepo-react-template
-    #     pwd
       
     # 1. Checkout репозитория
     - name: Checkout repository
@@ -44,68 +47,85 @@ jobs:
         npm install
         npm install -g lerna
     
-    - name: Get Commit Message
-      id: get-commit
+     # Шаг 4: Генерация CHANGELOG для каждого пакета
+    - name: Generate Changelog for ${{ matrix.package }}
       run: |
-        COMMIT_MESSAGE=$(git log -1 --format=%B)
-        echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-        echo "COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}"
-
-    # 4. Генерация CHANGELOG для каждого пакета с помощью Lerna
-    - name: Process Commit Message
-      id: process-commit
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const commitMessage = process.env.COMMIT_MESSAGE || '';
-          const lines = commitMessage.split(';\n');
-          const commands = [];
-
-          for (const line of lines) {
-            const match = line.match(/\(([^)]+)\)/); // Извлечение содержимого в скобках
-            if (match) {
-              const package = match[1];
-              switch (package) {
-                case 'front-end':
-                  commands.push('npm run changelog:front-end');
-                  break;
-                case 'plugin-component':
-                  commands.push('npm run changelog:plugin-component');
-                  break;
-                case 'root':
-                  commands.push('npm run changelog:root');
-                  break;
-              }
-            }
-          }
-          if (commands.length === 0) {
-            console.log('No matching packages found in commit message.');
-          }
-          
-          // Установить output с массивом команд как строку, разделенную ";"
-          core.setOutput('commands', commands.join(' && '));
-    
-    - name: Add changelog details
-      if: steps.process-commit.outputs.commands != ''
+        cd packages/${{ matrix.package }}
+        npx conventional-changelog -p angular -i CHANGELOG.md -s
+        
+    # Шаг 5: Коммит изменений (опционально)
+    - name: Commit and push changes
       run: |
-        # npx lerna version --conventional-commits --yes --no-push
-        commands="${{ steps.process-commit.outputs.commands }}"
-        eval "$commands"
-        git add .
-
-    - name: Set up GitHub authentication
+        # git config user.name "github-actions[bot]"
+        # git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add packages/${{ matrix.package }}/CHANGELOG.md
+        git commit -m "chore: update changelog for ${{ matrix.package }}" || echo "No changes to commit"
+        git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+    
+    # - name: Get Commit Message
+    #   id: get-commit
+    #   run: |
+    #     COMMIT_MESSAGE=$(git log -1 --format=%B)
+    #     echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+    #     echo "COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}"
 
-    # 6. Коммит и пуш изменений
-    - name: Commit and Push Changelog Updates
-      run: |
-        if git diff --cached --quiet; then
-          echo "No changes detected, skipping commit."
-        else
-          git commit -m "chore: update CHANGELOGs [skip ci]"
-          git push
-        fi
+    # # 4. Генерация CHANGELOG для каждого пакета с помощью Lerna
+    # - name: Process Commit Message
+    #   id: process-commit
+    #   uses: actions/github-script@v6
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     script: |
+    #       const commitMessage = process.env.COMMIT_MESSAGE || '';
+    #       const lines = commitMessage.split(';\n');
+    #       const commands = [];
+
+    #       for (const line of lines) {
+    #         const match = line.match(/\(([^)]+)\)/); // Извлечение содержимого в скобках
+    #         if (match) {
+    #           const package = match[1];
+    #           switch (package) {
+    #             case 'front-end':
+    #               commands.push('npm run changelog:front-end');
+    #               break;
+    #             case 'plugin-component':
+    #               commands.push('npm run changelog:plugin-component');
+    #               break;
+    #             case 'root':
+    #               commands.push('npm run changelog:root');
+    #               break;
+    #           }
+    #         }
+    #       }
+    #       if (commands.length === 0) {
+    #         console.log('No matching packages found in commit message.');
+    #       }
+
+    #       // Установить output с массивом команд как строку, разделенную ";"
+    #       core.setOutput('commands', commands.join(' && '));
+    
+    # - name: Add changelog details
+    #   if: steps.process-commit.outputs.commands != ''
+    #   run: |
+    #     # npx lerna version --conventional-commits --yes --no-push
+    #     commands="${{ steps.process-commit.outputs.commands }}"
+    #     eval "$commands"
+    #     git add .
+
+    # - name: Set up GitHub authentication
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   run: |
+    #     echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+
+    # # 6. Коммит и пуш изменений
+    # - name: Commit and Push Changelog Updates
+    #   run: |
+    #     if git diff --cached --quiet; then
+    #       echo "No changes detected, skipping commit."
+    #     else
+    #       git commit -m "chore: update CHANGELOGs [skip ci]"
+    #       git push
+    #     fi
