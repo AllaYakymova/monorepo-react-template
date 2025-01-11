@@ -60,4 +60,4 @@ jobs:
      
     - name: Logs
       run: |
-      "echo ${{ env.PR_NUMBER }} ${{ env.PR_DATA }}"
+        "echo ${{ env.PR_NUMBER }} ${{ env.PR_DATA }}"
