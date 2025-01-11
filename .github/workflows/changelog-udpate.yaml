@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - name: Set working directory
-    run: |
-      cd monorepo-react-template
-      pwd
+      run: |
+        cd monorepo-react-template
+        pwd
       
     # 1. Checkout репозитория
     - name: Checkout repository
