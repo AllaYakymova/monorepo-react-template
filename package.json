@@ -39,7 +39,7 @@
     "grpc:init": "node config/grpc.config.js",
     "changelog:front-end": "conventional-changelog -p angular -i packages/front-end/CHANGELOG.md -s -c 'front-end'",
     "changelog:plugin-component": "conventional-changelog -p angular -i packages/plugin-component/CHANGELOG.md -s -c 'plugin-component'",
-    "changelog:root": "conventional-changelog -p angular -i CHANGELOG.md -s -c 'root'",
+    "changelog:root": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-component && npm run changelog:root"
   },
   "devDependencies": {
