@@ -61,9 +61,14 @@ jobs:
               esac
             fi
           done <<< "$COMMIT_MESSAGE"
+      # run: |
+      #   # npx lerna version --conventional-commits --yes --no-push
+      #   # npm run changelog:all
+      #   git add . 
+    - name: Add changelog details
       run: |
-        # npx lerna version --conventional-commits --yes --no-push
-        # npm run changelog:all
+        npx lerna version --conventional-commits --yes --no-push
+       
         git add . 
 
     - name: Set up GitHub authentication
