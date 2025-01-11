@@ -15,7 +15,18 @@ jobs:
     # 1. Checkout репозитория
     - name: Checkout repository
       uses: actions/checkout@v3
-      
+      with:
+        path: 'monorepo-react-template'
+    
+    - name: Set working directory
+      run: |
+        cd monorepo-react-template
+        pwd
+
+    - name: Check working directory
+      run: |
+        pwd
+
     - name: Configure Git author
       run: |
         git config --global user.name "github-actions[bot]"
