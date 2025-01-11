@@ -36,8 +36,10 @@ jobs:
     - name: Get Commit Message
       id: get-commit
       run: |
-        echo "COMMIT_MESSAGE=$(git log -1 --format=%s%b)" >> $GITHUB_ENV
+        COMMIT_MESSAGE=$(git log -1 --format=%s%b)" 
+        echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
         echo "COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}"
+
 
     # 4. Генерация CHANGELOG для каждого пакета с помощью Lerna
     - name: Process Commit Message
