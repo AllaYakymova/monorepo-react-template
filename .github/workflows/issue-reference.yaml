@@ -15,37 +15,28 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # - name: Install dependencies
-    #   run: |
-    #     npm install @octokit/rest
-
     - name: Extract branch name
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
         ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
-        echo "BRANCH_NAME: $BRANCH_NAME"
-        echo "ISSUE_NUMBER: $ISSUE_NUMBER"
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
-
 
     - name: Update pull request template
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        debug: true
+        github-token: ${{ env.GITHUB_TOKEN }}
         script: |
-          // const fetch = require('node-fetch');
-
-          // Достаем номер issue и pull request из контекста
+          // get issue number, link and PR number from context
           const issueNumber = process.env.ISSUE_NUMBER;
           const prNumber = context.payload.pull_request.number;
-          const issueLink = `https://github.com/issues/${issueNumber}`;
-          // const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
+          const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
           const token = process.env.GITHUB_TOKEN;
 
-          // Получаем существующее описание PR
+          console.log('PR Context: ', context)
+
+          // get PR body
           const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
           const prResponse = await fetch(prUrl, {
             headers: {
@@ -60,10 +51,10 @@ jobs:
 
           const pullRequest = await prResponse.json();
 
-          // Обновляем тело PR
+          // Uodate PR body
           const updatedBody = pullRequest.body.replace(
             '<!-- ISSUE_LINK -->',
-            `[Issue #${issueNumber}](${issueLink})`
+            `[#${issueNumber}](${issueLink})`
           );
 
           // Отправляем обновленное описание PR
@@ -81,9 +72,4 @@ jobs:
             throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
           }
 
-          console.log(`PR #${prNumber} updated successfully.`);
-          
-     
-    - name: Logs
-      run: |
-        "echo ${{ env.PR_NUMBER }} ${{ env.PR_DATA }}"
+          console.log(`PR #${prNumber} updated with a linked issue {issueLink} successfully.`);
