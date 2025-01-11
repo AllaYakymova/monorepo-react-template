@@ -34,45 +34,53 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         debug: true
         script: |
-          const { Octokit } = await import('@octokit/rest'); 
-          // Инициализация Octokit с токеном GitHub
-          const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-          
-          const fs = require('fs');
+          const fetch = require('node-fetch');
+
+          // Достаем номер issue и pull request из контекста
           const issueNumber = process.env.ISSUE_NUMBER;
-          const issueLink = `https://github.com/issues/${issueNumber}`;
-          // Получаем номер PR из контекста
           const prNumber = context.payload.pull_request.number;
-          
-          /*
-            # onst prNumber = process.env.GITHUB_REF.split('/')[2]; // Получить номер PR из GITHUB_REF
-            # // Добавляем переменную окружения в файл GITHUB_ENV
-            fs.appendFileSync(process.env.GITHUB_ENV, `PR_NUMBER=${prNumber}\n`);
-          */
-          
+          const issueLink = `https://github.com/issues/${issueNumber}`;
+          // const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
+          const token = process.env.GITHUB_TOKEN;
+
           // Получаем существующее описание PR
-          // const { data: pullRequest } = await github.pulls.get({
-          // Получаем описание PR через API GitHub
-          const { data: pullRequest } = await octokit.pulls.get({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: prNumber,
+          const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
+          const prResponse = await fetch(prUrl, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+            },
           });
 
-          // fs.appendFileSync(process.env.GITHUB_ENV, `PR_DATA=${JSON.stringify(pullRequest)}\n`);
+          if (!prResponse.ok) {
+            throw new Error(`Failed to fetch PR: ${prResponse.statusText}`);
+          }
 
+          const pullRequest = await prResponse.json();
+
+          // Обновляем тело PR
           const updatedBody = pullRequest.body.replace(
             '<!-- ISSUE_LINK -->',
             `[Issue #${issueNumber}](${issueLink})`
           );
 
-          // Обновляем описание PR
-          await octokit.pulls.update({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: prNumber,
-            body: updatedBody,
+          // Отправляем обновленное описание PR
+          const updatePrResponse = await fetch(prUrl, {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ body: updatedBody }),
           });
+
+          if (!updatePrResponse.ok) {
+            throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
+          }
+
+          console.log(`PR #${prNumber} updated successfully.`);
+          
      
     - name: Logs
       run: |
