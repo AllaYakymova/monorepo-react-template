@@ -43,6 +43,7 @@
     "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-component && npm run changelog:root"
   },
   "devDependencies": {
+    "conventional-changelog-angular": "^8.0.0",
     "conventional-changelog-cli": "^5.0.0",
     "lerna": "^6.6.1",
     "nx": "15.7.2"
