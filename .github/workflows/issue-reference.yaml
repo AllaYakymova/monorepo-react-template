@@ -17,25 +17,11 @@ jobs:
 
     - name: Extract branch name
       run: |
-        # if [ -n "${GITHUB_HEAD_REF}" ]; then
-        #   BRANCH_NAME=${GITHUB_HEAD_REF}
-        # else
-        #   BRANCH_NAME=${GITHUB_REF_NAME}
-        # fi
         BRANCH_NAME="${GITHUB_HEAD_REF}"
-        # echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
         ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
-        echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
-        echo "GITHUB_REF: $GITHUB_REF"
+        echo "BRANCH_NAME: $BRANCH_NAME"
+        echo "ISSUE_NUMBER: $ISSUE_NUMBER"
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
-
-    # - name: Extract issue number from branch name
-    #   run: |
-    #     BRANCH_NAME=${GITHUB_REF_NAME}
-    #     ISSUE_NUMBER=$(echo "$BRANCH_NAME" | sed 's/issue-\([0-9]*\).*/\1/')
-    #     echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
-    #     echo "GITHUB_REF: $GITHUB_REF"
-    #     echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
 
     - name: Update pull request template
