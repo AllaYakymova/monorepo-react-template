@@ -43,7 +43,7 @@ jobs:
             pull_number: prNumber,
           });
 
-          fs.appendFileSync(process.env.GITHUB_ENV, `PR_DATA=${ppullRequest}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `PR_DATA=${JSON.stringify(pullRequest)}\n`);
 
           const updatedBody = pullRequest.body.replace(
             '<!-- ISSUE_LINK -->',
@@ -57,3 +57,7 @@ jobs:
             pull_number: prNumber,
             body: updatedBody,
           });
+     
+     - name: Logs
+        run: |
+        "echo ${{ env.PR_NUMBER }} ${{ env.PR_DATA }}"
