@@ -13,6 +13,10 @@ module.exports = {
     //     { "type": "build", "section": "Build System", "hidden": true },
     //     { "type": "ci", "hidden": true }
     // ],
+    parserOpts: {
+        headerPattern: /^(\w*)(?:\((.*)\))?: (.*)$/,
+        headerCorrespondence: ['type', 'scope', 'subject'], // Явно определяем, что такое "subject"
+    },
     writerOpts: {
         // Определение групп для типов коммитов
         groupBy: 'type', // Группировка коммитов по типу (feat, fix, etc.)
@@ -41,5 +45,16 @@ module.exports = {
 
         // Переопределение заголовка версии
         // headerPartial: '',
+        transform: (commit) => {
+            // Удалить scope из коммитов
+            if (commit.scope) {
+                delete commit.scope;
+            }
+            // Оставить только type и subject
+            if (commit.type && commit.subject) {
+                return commit;
+            }
+            return null; // Игнорировать коммиты без типа и тела
+        },
     },
 }
