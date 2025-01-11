@@ -34,7 +34,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         debug: true
         script: |
-          import { Octokit } from '@octokit/rest';
+          const { Octokit } = await import('@octokit/rest'); 
           // Инициализация Octokit с токеном GitHub
           const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
           
