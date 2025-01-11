@@ -12,16 +12,16 @@ jobs:
       contents: write
 
     steps:
-    - name: Set working directory
-      run: |
-        cd monorepo-react-template
-        pwd
+    # - name: Set working directory
+    #   run: |
+    #     cd monorepo-react-template
+    #     pwd
       
     # 1. Checkout репозитория
     - name: Checkout repository
       uses: actions/checkout@v3
-      # with:
-      #   path: 'monorepo-react-template'
+      with:
+        path: 'monorepo-react-template'
 
     - name: Check working directory
       run: |
