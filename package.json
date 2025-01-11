@@ -28,7 +28,7 @@
   "scripts": {
     "cra:init": "node config/custom.webpack.config.js",
     "grpc:init": "node config/grpc.config.js",
-    "changelog:front-end": "conventional-changelog -i packages/front-end/CHANGELOG.md -u -s .versionrc.js",
+    "changelog:front-end": "conventional-changelog -i packages/front-end/CHANGELOG.md -u -s -c .versionrc",
     "changelog:plugin-component": "conventional-changelog -p angular -i packages/plugin-component/CHANGELOG.md -u -s -c .versionrc.js",
     "changelog:root": "conventional-changelog -p angular -i CHANGELOG.md -u -s -c .versionrc.js --verbose",
     "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-component && npm run changelog:root"
