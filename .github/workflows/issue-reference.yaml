@@ -30,6 +30,10 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         debug: true
         script: |
+          const { Octokit } = require('@octokit/rest');
+          // Инициализация Octokit с токеном GitHub
+          const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+          
           const fs = require('fs');
           const issueNumber = process.env.ISSUE_NUMBER;
           const issueLink = `https://github.com/issues/${issueNumber}`;
@@ -43,7 +47,9 @@ jobs:
           */
           
           // Получаем существующее описание PR
-          const { data: pullRequest } = await github.pulls.get({
+          // const { data: pullRequest } = await github.pulls.get({
+          // Получаем описание PR через API GitHub
+          const { data: pullRequest } = await octokit.pulls.get({
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: prNumber,
@@ -57,7 +63,7 @@ jobs:
           );
 
           // Обновляем описание PR
-          await github.pulls.update({
+          await octokit.pulls.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: prNumber,
