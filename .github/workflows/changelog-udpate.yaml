@@ -13,7 +13,6 @@ jobs:
         package:
           - front-end
           - plugin-component
-        - root
 
     permissions:
       contents: write
