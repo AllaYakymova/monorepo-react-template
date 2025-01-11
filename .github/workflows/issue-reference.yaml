@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         npm install @octokit/rest
-    
+
     - name: Extract branch name
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
@@ -34,7 +34,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         debug: true
         script: |
-          const { Octokit } = require('@octokit/rest');
+          import { Octokit } from '@octokit/rest';
           // Инициализация Octokit с токеном GitHub
           const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
           
