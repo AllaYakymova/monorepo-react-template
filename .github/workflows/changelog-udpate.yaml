@@ -65,7 +65,6 @@ jobs:
               }
             }
           }
-
           if (commands.length === 0) {
             console.log('No matching packages found in commit message.');
           }
