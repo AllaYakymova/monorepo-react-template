@@ -1,27 +1,27 @@
 module.exports = {
-    header: [
-        '',
-        '# Changelog',
-        'All notable changes to this project will be documented in this file.',
-        ''
-    ].join('\n'),
-    "types": [
-        { "type": "feat", "section": "Features" },
-        { "type": "fix", "section": "Bug Fixes" },
-        { "type": "chore", "section": "Chores" },
-        { "type": "test", "section": "Tests", "hidden": true },
-        { "type": "build", "section": "Build System", "hidden": true },
-        { "type": "ci", "hidden": true }
-    ],
+    // header: [
+    //     '',
+    //     '# Changelog',
+    //     'All notable changes to this project will be documented in this file.',
+    //     ''
+    // ].join('\n'),
+    // "types": [
+    //     { "type": "feat", "section": "Features" },
+    //     { "type": "fix", "section": "Bug Fixes" },
+    //     { "type": "chore", "section": "Chores" },
+    //     { "type": "test", "section": "Tests", "hidden": true },
+    //     { "type": "build", "section": "Build System", "hidden": true },
+    //     { "type": "ci", "hidden": true }
+    // ],
     writerOpts: {
         // Определение групп для типов коммитов
         groupBy: 'type', // Группировка коммитов по типу (feat, fix, etc.)
         commitGroupsSort: 'title', // Сортировка групп в CHANGELOG
         commitsSort: ['scope', 'subject'], // Сортировка коммитов внутри группы
         noteGroupsSort: 'title', // Сортировка заметок (breaking changes и т.д.)
-        // commitPartial: "- {{ #if this.subject }}{ { this.subject } } { {/if } } \n",
+        commitPartial: "- {{ #if this.subject }}{ { this.subject } } { {/if } } \n",
         // Шаблон для каждой записи коммита
-        commitPartial: `- {{#if this.scope}}**{{this.scope}}:** {{/if}}{{this.subject}}\n`,
+        // commitPartial: `- {{#if this.scope}}**{{this.scope}}:** {{/if}}{{this.subject}}\n`,
 
         // Определение, как каждая группа будет названа
         groupTitleMap: {
