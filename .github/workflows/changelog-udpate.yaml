@@ -15,12 +15,22 @@ jobs:
     # 1. Checkout репозитория
     - name: Checkout repository
       uses: actions/checkout@v3
+      
+    - name: Configure Git author
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     # 2. Установка Node.js
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
+
+    - name: Ensure repository is correctly linked
+        run: |
+          git remote add origin https://github.com/${{ github.repository }}.git
+          git fetch origin
 
     # 3. Установка зависимостей
     - name: Install dependencies
@@ -35,6 +45,12 @@ jobs:
         # npm run changelog:all
         git add .    
 
+    - name: Set up GitHub authentication
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+
     # # 5. Настройка Git для использования GITHUB_TOKEN
     # - name: Configure Git to use GITHUB_TOKEN
     #   run: |
@@ -45,8 +61,6 @@ jobs:
 
     # 6. Коммит и пуш изменений
     - name: Commit and Push Changelog Updates
-      # with:
-      #   github-token: ${{ secrets.GITHUB_TOKEN }}
       run: |
         if git diff --cached --quiet; then
           echo "No changes detected, skipping commit."
@@ -54,7 +68,7 @@ jobs:
           git commit -m "chore: update CHANGELOGs [skip ci]"
           git push
         fi
-      env:
-        GIT_AUTHOR_NAME: "AllaYakymova"
-        GIT_AUTHOR_EMAIL: "allochkaja112@gmail.com"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # env:
+      #   GIT_AUTHOR_NAME: "AllaYakymova"
+      #   GIT_AUTHOR_EMAIL: "allochkaja112@gmail.com"
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
