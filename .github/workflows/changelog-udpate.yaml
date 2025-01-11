@@ -82,6 +82,13 @@ jobs:
         eval "$commands"
         git add .
 
+    # if: steps.process-commit.outputs.commands != ''
+    #  run: |
+    #    npx lerna version --conventional-commits --yes --no-push
+    #    commands="${{ steps.process-commit.outputs.commands }}"
+    #    eval "$commands"
+    #    git add .
+
       # - name: Run Commands in Bash
       #   if: steps.process-commit.outputs.commands != ''
       #   run: |
