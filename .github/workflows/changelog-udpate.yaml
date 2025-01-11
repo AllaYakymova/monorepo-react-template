@@ -32,44 +32,94 @@ jobs:
       run: |
         npm install
         npm install -g lerna
+    
+    - name: Get Commit Message
+      id: get-commit
+      run: echo "COMMIT_MESSAGE=$(git log -1 --format=%B)" >> $GITHUB_ENV
+
 
     # 4. Генерация CHANGELOG для каждого пакета с помощью Lerna
-    - name: Generate Changelogs
+    - name: Process Commit Message
+      id: process-commit
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          // Получить сообщение последнего коммита
-          COMMIT_MESSAGE=$(git log -1 --format=%B)
+          const commitMessage = process.env.COMMIT_MESSAGE || '';
+          const lines = commitMessage.split(';\n');
+          const commands = [];
 
-          // Разбить сообщение на строки
-          while IFS= read -r line; do
-            // Извлечь название пакета из строки
-            PACKAGE=$(echo "$line" | grep -oP '\(\K[^)]+')
-            
-            if [ -n "$PACKAGE" ]; then
-              case $PACKAGE in
-                front-end)
-                  npm run changelog:front-end
-                  ;;
-                plugin-component)
-                  npm run changelog:plugin-component
-                  ;;
-                root)
-                  npm run changelog:root
-                  ;;
-              esac
-            fi
-          done <<< "$COMMIT_MESSAGE"
+          for (const line of lines) {
+            const match = line.match(/\(([^)]+)\)/); // Извлечение содержимого в скобках
+            if (match) {
+              const package = match[1];
+              switch (package) {
+                case 'front-end':
+                  commands.push('npm run changelog:front-end');
+                  break;
+                case 'plugin-component':
+                  commands.push('npm run changelog:plugin-component');
+                  break;
+                case 'root':
+                  commands.push('npm run changelog:root');
+                  break;
+              }
+            }
+          }
+
+          if (commands.length === 0) {
+            console.log('No matching packages found in commit message.');
+          }
+
+          // Установить output с массивом команд как строку, разделенную ";"
+          core.setOutput('commands', commands.join(' && '));
+    
+    - name: Add changelog details
+      if: steps.process-commit.outputs.commands != ''
+      run: |
+        npx lerna version --conventional-commits --yes --no-push
+        commands="${{ steps.process-commit.outputs.commands }}"
+        eval "$commands"
+        git add .
+
+      # - name: Run Commands in Bash
+      #   if: steps.process-commit.outputs.commands != ''
+      #   run: |
+      #     echo "Running commands..."
+      #     commands="${{ steps.process-commit.outputs.commands }}"
+      #     eval "$commands"
+
+      # - name: Generate Changelogs
+      #   uses: actions/github-script@v6
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       // Получить сообщение последнего коммита
+      #       COMMIT_MESSAGE=$(git log -1 --format=%B)
+
+      #       // Разбить сообщение на строки
+      #       while IFS= read -r line; do
+      #         // Извлечь название пакета из строки
+      #         PACKAGE=$(echo "$line" | grep -oP '\(\K[^)]+')
+              
+      #         if [ -n "$PACKAGE" ]; then
+      #           case $PACKAGE in
+      #             front-end)
+      #               npm run changelog:front-end
+      #               ;;
+      #             plugin-component)
+      #               npm run changelog:plugin-component
+      #               ;;
+      #             root)
+      #               npm run changelog:root
+      #               ;;
+      #           esac
+      #         fi
+      #       done <<< "$COMMIT_MESSAGE"
       # run: |
       #   # npx lerna version --conventional-commits --yes --no-push
       #   # npm run changelog:all
       #   git add . 
-    - name: Add changelog details
-      run: |
-        npx lerna version --conventional-commits --yes --no-push
-       
-        git add . 
 
     - name: Set up GitHub authentication
       env:
