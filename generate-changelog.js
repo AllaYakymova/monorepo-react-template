@@ -2,39 +2,35 @@ const fs = require('fs');
 const gitLogParser = require('git-log-parser');
 const Handlebars = require('handlebars');
 const path = require('path');
-const childProcess = require('child_process');
 
 // Настройка шаблона
 const templateSource = fs.readFileSync('changelog_template.hbs', 'utf8');
 const template = Handlebars.compile(templateSource);
 
 // Парсинг логов Git
-const parser = new gitLogParser.Parser({
-    path: '.',
-    format: '%H,%s,%b',
+const parser = gitLogParser();
+
+parser.on('commit', commit => {
+    // Группировка коммитов по scope
+    const groupedCommits = groupedCommits || {};
+    const match = commit.message.match(/^(\w+)\((\w+)\):/);
+    if (match) {
+        const type = match[1];
+        const scope = match[2];
+        if (!groupedCommits[scope]) {
+            groupedCommits[scope] = {};
+        }
+        if (!groupedCommits[scope][type]) {
+            groupedCommits[scope][type] = [];
+        }
+        groupedCommits[scope][type].push({
+            subject: commit.message.replace(/^(\w+)\(\w+\): /, ''),
+            hash: commit.hash,
+        });
+    }
 });
 
-parser.parse().then(commits => {
-    // Группировка коммитов по scope
-    const groupedCommits = {};
-    commits.forEach(commit => {
-        const match = commit.message.match(/^(\w+)\((\w+)\):/);
-        if (match) {
-            const type = match[1];
-            const scope = match[2];
-            if (!groupedCommits[scope]) {
-                groupedCommits[scope] = {};
-            }
-            if (!groupedCommits[scope][type]) {
-                groupedCommits[scope][type] = [];
-            }
-            groupedCommits[scope][type].push({
-                subject: commit.message.replace(/^(\w+)\(\w+\): /, ''),
-                hash: commit.hash,
-            });
-        }
-    });
-
+parser.on('end', () => {
     // Генерация changelog для каждого scope
     const packagesDir = 'packages';
     fs.readdirSync(packagesDir).forEach(packageName => {
@@ -60,4 +56,9 @@ parser.parse().then(commits => {
 
 parser.on('error', error => {
     console.error('Ошибка при парсинге логов:', error);
+});
+
+parser.parse({
+    path: '.',
+    format: '%H,%s,%b',
 });
