@@ -1,21 +1,12 @@
-{{!-- {{#each releases}}
-### {{title}} ({{isoDate}})
-{{#each merges}}
-- Merge: {{message}} [{{id}}]({{href}})
-{{/each}}
-{{#each fixes}}
-- Fix: {{commit.subject}} [{{id}}]({{href}})
-{{/each}}
-{{#each commits}}
-- Commit: {{subject}} [{{shorthash}}]({{href}})
-{{/each}}
-{{/each}} --}}
-
 # Changelog for {{scope}}
 
+## Version {{version}} ({{releaseDate}})
+
 {{#each groupedCommits}}
-### {{@key}}
+### {{@key}}:
 {{#each this}}
-- {{subject}} [{{hash}}](https://github.com/monorepo-react-template/commit/{{hash}})
+* {{subject}} [{{hash}}](https://github.com/AllaYakymova/monorepo-react-template/commit/{{hash}})
+
+{{body}}
 {{/each}}
 {{/each}}

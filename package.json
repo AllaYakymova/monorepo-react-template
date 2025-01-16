@@ -32,8 +32,9 @@
     "grpc:init": "node config/grpc.config.js",
     "changelog:front-end": "lerna run changelog --scope=front-end --stream",
     "changelog:plugin-1": "lerna run changelog --scope=plugin-1 --stream",
-    "changelog:root": "auto-changelog --path . --output CHANGELOG.md --template keepachangelog",
-    "changelog:all": "node generate-changelog.js"
+    "changelog:root": "auto-changelog --path . --output CHANGELOG.md --template changelog_template",
+    "changelog:all": "node generate-changelog.js",
+    "release:all": "lerna version"
   },
   "devDependencies": {
     "auto-changelog": "^2.5.0",
