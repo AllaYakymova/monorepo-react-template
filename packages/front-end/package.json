@@ -2,23 +2,24 @@
   "private": true,
   "author": "UIUX Lab",
   "email": "uiuxlab@gmail.com",
-  "name": "next-app",
+  "name": "front-end",
   "version": "0.0.1",
   "description": "next-app in monorepo",
   "main": "next.config.js",
   "packages": [
     "packages/*"
   ],
-  "command": {
-    "version": {
-      "conventionalCommits": true
-    }
+  "auto-changelog": {
+    "output": "CHANGELOG.md",
+    "unreleased": true,
+    "commitLimit": false
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "changelog": "auto-changelog --path . --output CHANGELOG.md --template path: ../../changelog_template.hbs"
   },
   "dependencies": {
     "axios": "^0.27.2",
