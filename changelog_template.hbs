@@ -1,0 +1,21 @@
+{{!-- {{#each releases}}
+### {{title}} ({{isoDate}})
+{{#each merges}}
+- Merge: {{message}} [{{id}}]({{href}})
+{{/each}}
+{{#each fixes}}
+- Fix: {{commit.subject}} [{{id}}]({{href}})
+{{/each}}
+{{#each commits}}
+- Commit: {{subject}} [{{shorthash}}]({{href}})
+{{/each}}
+{{/each}} --}}
+
+# Changelog for {{scope}}
+
+{{#each groupedCommits}}
+### {{@key}}
+{{#each this}}
+- {{subject}} [{{hash}}](https://github.com/monorepo-react-template/commit/{{hash}})
+{{/each}}
+{{/each}}

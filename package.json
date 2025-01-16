@@ -13,9 +13,6 @@
     "template",
     "lerna"
   ],
-  "workspaces": [
-    "packages/*"
-  ],
   "packages": [
     "packages/*"
   ],
@@ -25,17 +22,21 @@
       "react-dom": "ReactDOM"
     }
   },
+  "auto-changelog": {
+    "output": "CHANGELOG.md",
+    "unreleased": true,
+    "commitLimit": false
+  },
   "scripts": {
     "cra:init": "node config/custom.webpack.config.js",
     "grpc:init": "node config/grpc.config.js",
-    "changelog:front-end": "conventional-changelog -i packages/front-end/CHANGELOG.md -u -s -c .versionrc.js",
-    "changelog:plugin-component": "conventional-changelog -p angular -i packages/plugin-component/CHANGELOG.md -s -s -r 0",
-    "changelog:root": "conventional-changelog -p angular -i CHANGELOG.md -u -s -c .versionrc.js --verbose",
-    "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-component && npm run changelog:root"
+    "changelog:front-end": "lerna run changelog --scope=front-end --stream",
+    "changelog:plugin-1": "lerna run changelog --scope=plugin-1 --stream",
+    "changelog:root": "auto-changelog --path . --output CHANGELOG.md --template keepachangelog",
+    "changelog:all": "node generate-changelog.js"
   },
   "devDependencies": {
-    "conventional-changelog-angular": "^8.0.0",
-    "conventional-changelog-cli": "^5.0.0",
+    "auto-changelog": "^2.5.0",
     "lerna": "^6.6.1",
     "nx": "15.7.2"
   },
@@ -44,5 +45,9 @@
   },
   "homepage": "https://github.com/xizon/monorepo-react-template#readme",
   "main": "none",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "git-log-parser": "^1.2.1",
+    "handlebars": "^4.7.8"
+  }
 }
