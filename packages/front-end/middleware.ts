@@ -5,7 +5,7 @@
  * @https://nextjs.org/docs/advanced-features/middleware
  */
 import { NextResponse } from 'next/server';
-
+console.log('fe changes')
 export function middleware(req) {
 
     const { pathname } = req.nextUrl;
