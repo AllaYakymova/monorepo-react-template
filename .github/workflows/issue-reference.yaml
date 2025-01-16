@@ -71,5 +71,4 @@ jobs:
           if (!updatePrResponse.ok) {
             throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
           }
-
           console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
