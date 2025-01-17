@@ -14,7 +14,9 @@
     "lerna"
   ],
   "packages": [
-    "packages/*"
+    "packages/front-end",
+    "packages/plugin-1",
+    ""
   ],
   "buildConfig": {
     "externals": {
