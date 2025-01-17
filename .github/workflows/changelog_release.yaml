@@ -53,12 +53,15 @@ jobs:
       - name: Check changes in front-end
         id: changes-front-end
         run: |
-          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-          git diff HEAD^ HEAD -- packages/front-end/ > changes.diff
-          else
-            git diff HEAD -- packages/front-end/ > changes.diff
-          fi
+          git fetch origin master
+          # Определяем общий предок между текущей веткой и удалённой master
+          BASE_BRANCH="master"
+          BASE_COMMIT=$(git merge-base HEAD origin/$BASE_BRANCH)
 
+          # Сравниваем изменения относительно общего предка
+          git diff $BASE_COMMIT HEAD -- packages/front-end/ > changes.diff
+
+          # Проверяем, есть ли изменения
           if [ -s changes.diff ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
@@ -113,14 +116,15 @@ jobs:
       - name: Check changes in plugin-1
         id: changes-plugin-1
         run: |
-          git diff --quiet || echo "No previous commit found. Skipping changes check."
-          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-           # check if any commit before
-            git diff HEAD^ HEAD -- packages/plugin-1/ > changes.diff
-          else
-            git diff HEAD -- packages/plugin-1/ > changes.diff
-          fi
+          git fetch origin master
+          # Определяем общий предок между текущей веткой и удалённой master
+          BASE_BRANCH="master"
+          BASE_COMMIT=$(git merge-base HEAD origin/$BASE_BRANCH)
 
+          # Сравниваем изменения относительно общего предка
+          git diff $BASE_COMMIT HEAD -- packages/plugin-1/ > changes.diff
+
+          # Проверяем, есть ли изменения
           if [ -s changes.diff ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
