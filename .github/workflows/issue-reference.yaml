@@ -35,47 +35,45 @@ jobs:
           // get issue number, link and PR number from context
           const issueNumber = process.env.ISSUE_NUMBER;
           const prNumber = context.payload.pull_request.number;
-          if (prNumber) {
-            const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
-            const token = process.env.GITHUB_TOKEN;
+          const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
+          const token = process.env.GITHUB_TOKEN;
 
-            console.log('PR Context: ', context)
+          console.log('PR Context: ', context)
 
-            // get PR body
-            const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
-            const prResponse = await fetch(prUrl, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: 'application/vnd.github.v3+json',
-              },
-            });
+          // get PR body
+          const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
+          const prResponse = await fetch(prUrl, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+            },
+          });
 
-            if (!prResponse.ok) {
-              throw new Error(`Failed to fetch PR: ${prResponse.statusText}`);
-            }
-
-            const pullRequest = await prResponse.json();
-
-            // Uodate PR body
-            const updatedBody = pullRequest.body.replace(
-              '<!-- ISSUE_LINK -->',
-              `[#${issueNumber}](${issueLink})`
-            );
-
-            // Отправляем обновленное описание PR
-            const updatePrResponse = await fetch(prUrl, {
-              method: 'PATCH',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ body: updatedBody }),
-            });
-
-            if (!updatePrResponse.ok) {
-              throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
-            }
-            console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
+          if (!prResponse.ok) {
+            throw new Error(`Failed to fetch PR: ${prResponse.statusText}`);
           }
-         
+
+          const pullRequest = await prResponse.json();
+
+          // Uodate PR body
+          const updatedBody = pullRequest.body.replace(
+            '<!-- ISSUE_LINK -->',
+            issueNumber ? `[#${issueNumber}](${issueLink})` : ''
+          );
+
+          // Отправляем обновленное описание PR
+          const updatePrResponse = await fetch(prUrl, {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ body: updatedBody }),
+          });
+
+          if (!updatePrResponse.ok) {
+            throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
+          }
+          console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
+        
