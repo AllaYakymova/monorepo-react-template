@@ -50,23 +50,24 @@ jobs:
       - name: Check changes in front-end
         id: changes-front-end
         run: |
-          # Обновляем локальную информацию о ветках
+          # Обновляем локальные данные о ветке master
           git fetch origin master
 
-          # Определяем общий предок между текущей веткой и origin/master
+          # Проверяем, существует ли ветка master на удалённом репозитории
           BASE_BRANCH="origin/master"
           if git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            # Находим общий предок между текущей веткой и master
             BASE_COMMIT=$(git merge-base HEAD $BASE_BRANCH)
           else
             echo "No common ancestor found. Using initial commit as base."
             BASE_COMMIT=$(git rev-list --max-parents=0 HEAD)
           fi
 
-          # Сравниваем изменения относительно базовой точки
-          git diff $BASE_COMMIT HEAD -- packages/front-end/ > changes.diff
+          # Сравниваем изменения в front-end относительно базового коммита
+          git diff --quiet $BASE_COMMIT HEAD -- packages/front-end || echo "Changes detected" >> $GITHUB_ENV
 
-          # Проверяем, есть ли изменения
-          if [ -s changes.diff ]; then
+          # Если изменения есть, сохраняем флаг
+          if [ $? -eq 0 ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
@@ -122,21 +123,24 @@ jobs:
       - name: Check changes in plugin-1
         id: changes-plugin-1
         run: |
+          # Обновляем локальные данные о ветке master
           git fetch origin master
-          # Определяем общий предок между текущей веткой и origin/master
+
+          # Проверяем, существует ли ветка master на удалённом репозитории
           BASE_BRANCH="origin/master"
           if git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            # Находим общий предок между текущей веткой и master
             BASE_COMMIT=$(git merge-base HEAD $BASE_BRANCH)
           else
             echo "No common ancestor found. Using initial commit as base."
             BASE_COMMIT=$(git rev-list --max-parents=0 HEAD)
           fi
 
-          # Сравниваем изменения относительно базовой точки
-          git diff $BASE_COMMIT HEAD -- packages/plugin-1/ > changes.diff
+          # Сравниваем изменения в plugin-1 относительно базового коммита
+          git diff --quiet $BASE_COMMIT HEAD -- packages/plugin-1/ || echo "Changes detected" >> $GITHUB_ENV
 
-          # Проверяем, есть ли изменения
-          if [ -s changes.diff ]; then
+          # Если изменения есть, сохраняем флаг
+          if [ $? -eq 0 ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
