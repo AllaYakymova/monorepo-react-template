@@ -1,8 +1,12 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "useWorkspaces": true,
   "version": "independent",
+  "useWorkspaces": false,
+  "packages": [
+    "packages/*"
+  ],
   "changelog": {
-    "preset": "angular"
+    "preset": "angular",
+    "repo": "monorepo-react-template"
   }
 }
