@@ -54,11 +54,16 @@ jobs:
         id: changes-front-end
         run: |
           git fetch origin master
-          # Определяем общий предок между текущей веткой и удалённой master
-          BASE_BRANCH="master"
-          BASE_COMMIT=$(git merge-base HEAD origin/$BASE_BRANCH)
+          # Определяем общий предок между текущей веткой и origin/master
+          BASE_BRANCH="origin/master"
+          if git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            BASE_COMMIT=$(git merge-base HEAD $BASE_BRANCH)
+          else
+            echo "No common ancestor found. Using initial commit as base."
+            BASE_COMMIT=$(git rev-list --max-parents=0 HEAD)
+          fi
 
-          # Сравниваем изменения относительно общего предка
+          # Сравниваем изменения относительно базовой точки
           git diff $BASE_COMMIT HEAD -- packages/front-end/ > changes.diff
 
           # Проверяем, есть ли изменения
@@ -117,11 +122,16 @@ jobs:
         id: changes-plugin-1
         run: |
           git fetch origin master
-          # Определяем общий предок между текущей веткой и удалённой master
-          BASE_BRANCH="master"
-          BASE_COMMIT=$(git merge-base HEAD origin/$BASE_BRANCH)
+          # Определяем общий предок между текущей веткой и origin/master
+          BASE_BRANCH="origin/master"
+          if git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            BASE_COMMIT=$(git merge-base HEAD $BASE_BRANCH)
+          else
+            echo "No common ancestor found. Using initial commit as base."
+            BASE_COMMIT=$(git rev-list --max-parents=0 HEAD)
+          fi
 
-          # Сравниваем изменения относительно общего предка
+          # Сравниваем изменения относительно базовой точки
           git diff $BASE_COMMIT HEAD -- packages/plugin-1/ > changes.diff
 
           # Проверяем, есть ли изменения
@@ -130,7 +140,7 @@ jobs:
           else
             echo "changes=false" >> $GITHUB_ENV
           fi
-
+          
       # 5.2 Сбор данных коммитов
       - name: Generate changelog for plugin-1
         if: env.changes == 'true'
