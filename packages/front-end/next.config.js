@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    //
     reactStrictMode: true,
     swcMinify: true,
     //  add a page route with html extension 
