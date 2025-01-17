@@ -25,7 +25,7 @@
     "start": "next start",
     "lint": "next lint",
     "changelog1": "auto-changelog --path . --output CHANGELOG.md --template path: ../../changelog_template.hbs",
-    "changelog:conv": "conventional-changelog -p angular -c ../../versionrc.js -i CHANGELOG.md -s"
+    "changelog:conv": "conventional-changelog -p angular -c ../../versionrc.js  --from v0.0.1 -i CHANGELOG.md -s"
   },
   "dependencies": {
     "axios": "^0.27.2",
