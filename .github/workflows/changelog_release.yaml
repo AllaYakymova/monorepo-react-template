@@ -1,0 +1,165 @@
+name: Generate Changelog and Release
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+    inputs:
+      node_version:
+      publish_front:
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release front-end'
+      publish_plugin:
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release plugin-1'
+      publish_root:
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release root'
+# env:
+#   PACKAGE: ${{ github.event.inputs.package || 'lib-epods-react-components' }}
+
+jobs:
+  generate-and-release-front-end:
+   runs-on: ubuntu-latest
+   permissions:
+      contents: 'write'
+      packages: 'write'
+  
+   if: ${{ inputs.publish_front == true }}
+   steps:
+      # 1.1 Checkout репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2.1 Установить зависимости
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+       # 3.1 Установить зависимости для работы с git
+      - name: Install dependencies
+        run: |
+          npm install -g conventional-changelog-cli
+
+       # 4.1 Проверить изменения в front-end
+      - name: Check changes in front-end
+        id: changes-front-end
+        run: |
+          git diff HEAD^ HEAD -- packages/front-end/ > changes.diff
+          if [ -s changes.diff ]; then
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+
+       # 5.1 Сбор данных коммитов
+      - name: Generate changelog for front-end
+        # if: ${{ steps.setup.outputs.pr-running != 'true' && inputs.publish_components != true && inputs.publish_editor != true }}
+        if: env.changes == 'true'
+        run: |
+          # Генерация CHANGELOG.md для front-end
+          npm run changelog:front-end
+
+      # 6.1 Создать релиз для front-end, если есть изменения
+      - name: Create GitHub Release for front-end
+        if: env.changes == 'true'
+        uses: actions/create-release@v1
+        with:
+          tag_name: front-end-v${{ github.run_id }}
+          release_name: front-end Release v${{ github.run_id }}
+          draft: false
+          prerelease: false
+          body: |
+            See the latest changes for front-end in [CHANGELOG.md](packages/front-end/CHANGELOG.md).
+
+
+  generate-and-release-plugin-1:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      packages: 'write'
+
+    if: ${{ inputs.publish_plugin == true }}
+    steps:
+      # 1.2 Checkout репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2.2 Установить зависимости
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # 3.2 Установить зависимости для работы с git
+      - name: Install dependencies
+        run: |
+          npm install -g conventional-changelog-cli
+
+      # 4.2 Проверить изменения в plugin-1
+      - name: Check changes in plugin-1
+        id: changes-plugin-1
+        run: |
+          git diff HEAD^ HEAD -- packages/plugin-1/ > changes.diff
+          if [ -s changes.diff ]; then
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+
+      # 5.2 Сбор данных коммитов
+      - name: Generate changelog for plugin-1
+        if: env.changes == 'true'
+        run: |
+          # Генерация CHANGELOG.md для plugin-1
+          npm run changelog:plugin-1
+
+      # - name: Set up GitHub authentication
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+
+      # 6.2 Создать релиз для plugin-1, если есть изменения
+      - name: Create GitHub Release for plugin-1
+        if: env.changes == 'true'
+        uses: actions/create-release@v1
+        with:
+          tag_name: plugin-1-v${{ github.run_id }}
+          release_name: plugin-1 Release v${{ github.run_id }}
+          draft: false
+          prerelease: false
+          body: |
+            See the latest changes for plugin-1 in [CHANGELOG.md](packages/plugin-1/CHANGELOG.md).
+
+  
+  # create-release:
+    # needs: generate-changelog
+    # runs-on: ubuntu-latest
+
+    # steps:
+    #   # 1. Checkout репозиторий
+    #   - name: Checkout repository
+    #     uses: actions/checkout@v3
+
+    #   # 2. Создать релиз
+    #   - name: Create GitHub Release
+    #     uses: actions/create-release@v1
+    #     with:
+    #       tag_name: ${{ github.ref }}
+    #       release_name: Release ${{ github.ref }}
+    #       draft: false
+    #       prerelease: false
+    #       body: |
+    #         Changelog updates for:
+    #         - [root](CHANGELOG.md)
+    #         - [front-end](packages/front-end/CHANGELOG.md)
+    #         - [plugin-1](packages/plugin-1/CHANGELOG.md)

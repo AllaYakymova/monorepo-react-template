@@ -22,22 +22,33 @@
       "react-dom": "ReactDOM"
     }
   },
+  "command": {
+    "version": {
+      "conventionalCommits": true
+    }
+  },
   "auto-changelog": {
     "output": "CHANGELOG.md",
     "unreleased": true,
     "commitLimit": false
   },
   "scripts": {
+    "install-all": "npm install && lerna bootstrap --hoist",
     "cra:init": "node config/custom.webpack.config.js",
     "grpc:init": "node config/grpc.config.js",
-    "changelog:front-end": "lerna run changelog --scope=front-end --stream",
-    "changelog:plugin-1": "lerna run changelog --scope=plugin-1 --stream",
-    "changelog:root": "auto-changelog --path . --output CHANGELOG.md --template changelog_template",
-    "changelog:all": "node generate-changelog.js",
+    "changelog:front-end:1": "lerna run changelog --scope=front-end --stream",
+    "changelog:plugin-1:1": "lerna run changelog --scope=plugin-1 --stream",
+    "changelog:root:1": "auto-changelog --path . --output CHANGELOG.md --template changelog_template",
+    "changelog:all:1": "node generate-changelog.js",
+    "changelog:front-end": "lerna run changelog:conv --scope=front-end",
+    "changelog:plugin-1": "lerna run changelog:conv --scope=plugin-1",
+    "changelog:root": "conventional-changelog -p angular -c versionrc.js -i CHANGELOG.md -s",
+    "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-1 && npm run changelog:root",
     "release:all": "lerna version"
   },
   "devDependencies": {
     "auto-changelog": "^2.5.0",
+    "conventional-changelog-cli": "^5.0.0",
     "lerna": "^6.6.1",
     "nx": "15.7.2"
   },
@@ -48,6 +59,7 @@
   "main": "none",
   "license": "MIT",
   "dependencies": {
+    "all": "^0.0.0",
     "git-log-parser": "^1.2.1",
     "handlebars": "^4.7.8"
   }

@@ -14,12 +14,18 @@
     "unreleased": true,
     "commitLimit": false
   },
+  "command": {
+    "version": {
+      "conventionalCommits": true
+    }
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "changelog": "auto-changelog --path . --output CHANGELOG.md --template path: ../../changelog_template.hbs"
+    "changelog1": "auto-changelog --path . --output CHANGELOG.md --template path: ../../changelog_template.hbs",
+    "changelog:conv": "conventional-changelog -p angular -c ../../versionrc.js  --from v0.0.1 -i CHANGELOG.md -s"
   },
   "dependencies": {
     "axios": "^0.27.2",
