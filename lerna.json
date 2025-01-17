@@ -1,9 +1,12 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
+  "npmClient": "npm",
   "useWorkspaces": false,
   "packages": [
-    "packages/*"
+    "packages/front-end",
+    "packages/plugin-1",
+    ""
   ],
   "changelog": {
     "preset": "angular",
