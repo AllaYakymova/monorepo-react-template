@@ -34,3 +34,6 @@ jobs:
           git add .
           git commit -m "chore: update changelogs"
           git push origin HEAD
+      
+      - name: Run Release Please (create GitHub release)
+        run: npx release-please github-release --config .release-please-config.js

@@ -1,4 +1,5 @@
 module.exports = {
+  repoUrl: "https://github.com/AllaYakymova/monorepo-react-template",
   packages: {
     // Пример пакета package-1
     'packages/front-end': {
@@ -32,4 +33,9 @@ module.exports = {
     strategy: 'semver', // или можно использовать другой подход
     initialVersion: '0.1.1',
     },
+  plugins: [
+    {
+      type: "node-workspace"
+    }
+  ]
 };
