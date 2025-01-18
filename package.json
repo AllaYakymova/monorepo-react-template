@@ -43,8 +43,8 @@
     "changelog:root:1": "auto-changelog --path . --output CHANGELOG.md --template changelog_template",
     "changelog:all:1": "node generate-changelog.js",
     "changelog:front-end": "conventional-changelog -p angular --tag-prefix=front-end-v --unreleased -c .versionrc.js  --commit-path=packages/front-end -i packages/front-end/CHANGELOG.md -s",
-    "changelog:plugin-1": "conventional-changelog -p angular --tag-prefix=front-end-v --unreleased -c .versionrc.js  --commit-path=packages/plugin-1 -i packages/plugin-1/CHANGELOG.md -s",
-    "changelog:root": "conventional-changelog -p angular --tag-prefix=front-end-v --unreleased -c .versionrc.js -i CHANGELOG.md -s",
+    "changelog:plugin-1": "conventional-changelog -p angular --tag-prefix=plugin-1-v -c .versionrc.js  --commit-path=packages/plugin-1 -i packages/plugin-1/CHANGELOG.md -s",
+    "changelog:root": "conventional-changelog -p angular --tag-prefix=v --unreleased -c .versionrc.js -i CHANGELOG.md -s",
     "changelog:all": "npm run changelog:front-end && npm run changelog:plugin-1 && npm run changelog:root",
     "release:all": "lerna version"
   },

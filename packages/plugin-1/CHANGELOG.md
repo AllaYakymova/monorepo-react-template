@@ -1,4 +1,3 @@
-## [0.1.1](https://github.com/xizon/monorepo-react-template/compare/front-end-v0.2.0...front-end-v0.1.1) (2025-01-18)
 
 
 
@@ -6,7 +5,7 @@
 
 
 
-## 0.1.1 (2025-01-18)
+## 0.0.1 (2025-01-18)
 
 
 ### Bug Fixes
