@@ -1,3 +1,18 @@
+## [0.1.1](https://github.com/xizon/monorepo-react-template/compare/front-end-v0.0.1...front-end-v0.1.1) (2025-01-18)
+
+
+### Bug Fixes
+
+* **css:** change bgc for hover ([0738d17](https://github.com/xizon/monorepo-react-template/commit/0738d171c4e5d190e09d4e88684721917e7ed7aa))
+* **front-end:** cleanup ([9804fce](https://github.com/xizon/monorepo-react-template/commit/9804fcec5d9b86fc9f888b5023d72527dc68b782))
+
+
+### Features
+
+* **Button:** add console log ([78ffb20](https://github.com/xizon/monorepo-react-template/commit/78ffb2056c88c5119570552393197796006f99ac))
+
+
+
 ## [0.1.1](https://github.com/xizon/monorepo-react-template/compare/v0.0.1...v0.1.1) (2025-01-18)
 
 
