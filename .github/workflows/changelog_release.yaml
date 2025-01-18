@@ -75,9 +75,7 @@ jobs:
           fi
 
        # 5.1 Сбор данных коммитов
-      
       - name: Generate changelog for front-end
-        # if: ${{ steps.setup.outputs.pr-running != 'true' && inputs.publish_components != true && inputs.publish_editor != true }}
         if: env.changes == 'true'
         run: |
           # Генерация CHANGELOG.md для front-end
@@ -146,7 +144,7 @@ jobs:
       - name: Check changes in plugin-1
         id: changes-plugin-1
         run: |
-          # Обновляем локальные данные о ветке master
+         # Обновляем локальные данные о ветке master
           git fetch origin master
 
           # Проверяем, существует ли ветка master на удалённом репозитории
@@ -154,16 +152,17 @@ jobs:
           if git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
             # Находим общий предок между текущей веткой и master
             BASE_COMMIT=$(git merge-base HEAD $BASE_BRANCH)
+            echo "BASE_COMMIT=$BASE_COMMIT"
           else
             echo "No common ancestor found. Using initial commit as base."
             BASE_COMMIT=$(git rev-list --max-parents=0 HEAD)
           fi
 
           # Сравниваем изменения в plugin-1 относительно базового коммита
-          git diff $BASE_COMMIT HEAD -- packages/plugin-1 > changes.diff
+          git diff --quiet $BASE_COMMIT HEAD -- packages/plugin-1 || echo "Changes detected" >> $GITHUB_ENV
 
-          # Если изменения есть в plugin-1, сохраняем флаг
-          if [ -s changes.diff ]; then
+          # Если изменения есть, сохраняем флаг
+          if [ $? -eq 0 ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
