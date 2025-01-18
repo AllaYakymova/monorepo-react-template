@@ -26,14 +26,19 @@ jobs:
 
       - name: Automatically create changeset
         run: |
-          # Находим все измененные пакеты (папки), создаем changeset для каждого
+         # Находим все измененные пакеты (папки), создаем changeset для каждого
           CHANGED_PACKAGES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^packages/' | cut -d '/' -f2 | sort | uniq)
           
-          # Создаем changeset для каждого измененного пакета
-          for package in $CHANGED_PACKAGES; do
-            echo "Creating changeset for package: $package"
-            npx changeset add "$package" --type minor --message "Automated change for $package"
-          done
+          # Проверяем, если пакеты изменились
+          if [ -z "$CHANGED_PACKAGES" ]; then
+            echo "No changes in packages found, skipping changeset creation."
+          else
+            # Создаем changeset для каждого измененного пакета
+            for package in $CHANGED_PACKAGES; do
+              echo "Creating changeset for package: $package"
+              npx changeset add "$package" --type minor --message "Automated change for $package"
+            done
+          fi
 
       - name: Commit and push changesets
         run: |
