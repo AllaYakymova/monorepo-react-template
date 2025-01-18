@@ -1,0 +1,35 @@
+name: Release Please
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install-all
+
+      - name: Run Release Please
+        run: npm run release-please
+
+      # Добавляем шаг для коммита и пуша изменений в changelog
+      - name: Commit and push changelog updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Для доступа к репозиторию
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update changelogs"
+          git push origin HEAD
