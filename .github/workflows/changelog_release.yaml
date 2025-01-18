@@ -159,10 +159,10 @@ jobs:
           fi
 
           # Сравниваем изменения в plugin-1 относительно базового коммита
-          git diff --quiet $BASE_COMMIT HEAD -- packages/plugin-1/ || echo "Changes detected" >> $GITHUB_ENV
+          git diff $BASE_COMMIT HEAD -- packages/plugin-1/ > changes.diff
 
-          # Если изменения есть, сохраняем флаг
-          if [ $? -eq 0 ]; then
+          # Если изменения есть в plugin-1, сохраняем флаг
+          if [ -s changes.diff ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
