@@ -165,7 +165,6 @@ jobs:
         if: env.changes == 'true'
         uses: actions/create-release@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: plugin-1-v${{ github.run_id }}
           release_name: plugin-1 Release v${{ github.run_id }}
           draft: false
@@ -243,10 +242,10 @@ jobs:
         if: env.changes == 'true'
         uses: actions/create-release@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: root-v${{ github.run_id }}
           release_name: root Release v${{ github.run_id }}
-          draft: false
+          draft: true
           prerelease: false
           body: |
             See the latest changes for root in [CHANGELOG.md](CHANGELOG.md).
