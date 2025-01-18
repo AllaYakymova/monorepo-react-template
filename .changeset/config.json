@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.5/schema.json",
+  "changelog": "@changesets/changelog-github",
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "master",
+  "updateInternalDependencies": "none",
+  "ignore": [],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "updateInternalDependents": "always"
+  },
+  "changelogOptions": {
+    "repo": "AllaYakymova/monorepo-react-template",
+    "releaseType": "github",
+    "filename": "CHANGELOG.md",
+    "packages": [
+      {
+        "name": "front-end",
+        "changelog": "packages/front-end/CHANGELOG.md"
+      },
+      {
+        "name": "plugin-1",
+        "changelog": "packages/plugin-1/CHANGELOG.md"
+      },
+      {
+        "name": "root",
+        "changelog": "CHANGELOG.md"
+      }
+    ]
+  }
+}

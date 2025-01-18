@@ -16,6 +16,7 @@
   ],
   "changelog": {
     "preset": "angular",
-    "repo": "monorepo-react-template"
-  }
+    "repo": "AllaYakymova/monorepo-react-template",
+    "commit": false
+  },
 }
