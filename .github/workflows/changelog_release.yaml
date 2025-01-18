@@ -111,6 +111,10 @@ jobs:
           body: |
             See the latest changes for front-end in [CHANGELOG.md](packages/front-end/CHANGELOG.md).
 
+      - name: Save Release ID
+        run: |
+          echo "RELEASE_ID=${{ steps.create_release.outputs.id }}" >> $GITHUB_ENV
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
 
   generate-and-release-plugin-1:
     runs-on: ubuntu-latest
@@ -186,25 +190,25 @@ jobs:
         run: |
           git push origin HEAD
 
-      # 6.2 Создать релиз для plugin-1, если есть изменения
-      - name: Create GitHub Release for plugin-1
-        id: create_release
-        if: env.changes == 'true'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: plugin-1-v${{ github.run_id }}
-          release_name: plugin-1 Release v${{ github.run_id }}
-          draft: false
-          prerelease: false
-          body: |
-            See the latest changes for plugin-1 in [CHANGELOG.md](packages/plugin-1/CHANGELOG.md).
+      # # 6.2 Создать релиз для plugin-1, если есть изменения
+      # - name: Create GitHub Release for plugin-1
+      #   id: create_release
+      #   if: env.changes == 'true'
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: plugin-1-v${{ github.run_id }}
+      #     release_name: plugin-1 Release v${{ github.run_id }}
+      #     draft: false
+      #     prerelease: false
+      #     body: |
+      #       See the latest changes for plugin-1 in [CHANGELOG.md](packages/plugin-1/CHANGELOG.md).
       
-      - name: Save Release ID
-        run: |
-          echo "RELEASE_ID=${{ steps.create_release.outputs.id }}" >> $GITHUB_ENV
-          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
+      # - name: Save Release ID
+      #   run: |
+      #     echo "RELEASE_ID=${{ steps.create_release.outputs.id }}" >> $GITHUB_ENV
+      #     echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
       
   generate-and-release-root:
     runs-on: ubuntu-latest
@@ -288,13 +292,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: root-v${{ github.run_id }}
-          release_name: root Release v${{ github.run_id }}
+          release_name: Root Release v${{ github.run_id }}
           draft: true
           prerelease: false
           body: |
             See the latest changes for root in [CHANGELOG.md](CHANGELOG.md).
 
-  
+      - name: Save Release ID
+        run: |
+          echo "RELEASE_ID=${{ steps.create_release.outputs.id }}" >> $GITHUB_ENV
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
+
   # create-release:
     # needs: generate-changelog
     # runs-on: ubuntu-latest
