@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install-all
+        run: npm run install-all
 
       - name: Run Release Please
         run: npm run release-please
