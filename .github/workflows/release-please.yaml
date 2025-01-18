@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: 'write'
       packages: 'write'
+      pull-requests: 'write'  # Для создания и управления Pull Request
+      issues: 'write'  # Для работы с issues (если требуется)
+      workflows: 'write'
       
     steps:
       - name: Checkout code

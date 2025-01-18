@@ -55,9 +55,9 @@
     "changeset-publish": "npx changeset publish",
     "version": "npm run changeset-version && npm run changeset-publish",
     "release": "lerna run version --yes && lerna publish from-package --yes",
-    "init-manifest": "npx release-please bootstrap --config-file .release-please-config.js --default-branch master  --repo-url https://github.com/AllaYakymova/monorepo-react-template",
-    "release-pr": "npx release-please release-pr --config-file .release-please-config.js --repo-url https://github.com/AllaYakymova/monorepo-react-template",
-    "release-please": "npm run init-manifest && npm run release-pr"
+    "init-manifest": "npx release-please bootstrap --config-file .release-please-config.js --default-branch master --repo-url https://github.com/AllaYakymova/monorepo-react-template --debug",
+    "release-pr": "npx release-please release-pr --config-file .release-please-config.js --repo-url https://github.com/AllaYakymova/monorepo-react-template --target-branch master",
+    "release-please": "npm run release-pr"
 
   },
   "devDependencies": {
