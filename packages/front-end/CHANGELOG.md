@@ -1,3 +1,7 @@
+## [0.1.1](https://github.com/xizon/monorepo-react-template/compare/v0.0.1...v0.1.1) (2025-01-18)
+
+
+
 ## 0.1.1 (2025-01-18)
 
 
