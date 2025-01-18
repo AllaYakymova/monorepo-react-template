@@ -159,7 +159,7 @@ jobs:
           fi
 
           # Сравниваем изменения в plugin-1 относительно базового коммита
-          git diff $BASE_COMMIT HEAD -- packages/plugin-1/ > changes.diff
+          git diff $BASE_COMMIT HEAD -- packages/plugin-1 > changes.diff
 
           # Если изменения есть в plugin-1, сохраняем флаг
           if [ -s changes.diff ]; then
@@ -190,20 +190,20 @@ jobs:
         run: |
           git push origin HEAD
 
-      # 6.2 Создать релиз для plugin-1, если есть изменения
-      - name: Create GitHub Release for plugin-1
-        id: create_release
-        if: env.changes == 'true'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: plugin-1-v${{ github.run_id }}
-          release_name: plugin-1 Release v${{ github.run_id }}
-          draft: false
-          prerelease: false
-          body: |
-            See the latest changes for plugin-1 in [CHANGELOG.md](packages/plugin-1/CHANGELOG.md).
+      # # 6.2 Создать релиз для plugin-1, если есть изменения
+      # - name: Create GitHub Release for plugin-1
+      #   id: create_release
+      #   if: env.changes == 'true'
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: plugin-1-v${{ github.run_id }}
+      #     release_name: plugin-1 Release v${{ github.run_id }}
+      #     draft: false
+      #     prerelease: false
+      #     body: |
+      #       See the latest changes for plugin-1 in [CHANGELOG.md](packages/plugin-1/CHANGELOG.md).
       
       # - name: Save Release ID
       #   run: |
