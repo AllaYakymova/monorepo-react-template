@@ -1,0 +1,66 @@
+name: Create Changeset
+
+on:
+  # pull_request:
+  #   paths:
+  #     - 'packages/**'   # Следим за изменениями в папке с пакетами
+  workflow_dispatch: {
+
+  }    
+
+jobs:
+  create-changeset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # Укажите вашу версию Node.js
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Automatically create changeset
+        run: |
+          # Находим все измененные пакеты (папки), создаем changeset для каждого
+          CHANGED_PACKAGES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^packages/' | cut -d '/' -f2 | sort | uniq)
+          
+          # Создаем changeset для каждого измененного пакета
+          for package in $CHANGED_PACKAGES; do
+            echo "Creating changeset for package: $package"
+            npx changeset add "$package" --type minor --message "Automated change for $package"
+          done
+
+      - name: Commit and push changesets
+        run: |
+          git add .changeset/
+          git commit -m "Automated changesets for updated packages"
+          git push origin ${{ github.head_ref }}
+
+  version-publish:
+    needs: create-changeset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm run install-all
+
+      - name: Run Changeset Version
+        run: |
+          npm run changeset-version
+
+      - name: Run Changeset Publish
+        run: |
+          npm run changeset-publish
