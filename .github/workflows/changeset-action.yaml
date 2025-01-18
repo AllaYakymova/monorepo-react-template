@@ -37,6 +37,8 @@ jobs:
 
       - name: Commit and push changesets
         run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git add .changeset/
           git commit -m "Automated changesets for updated packages"
           git push origin ${{ github.head_ref }}
