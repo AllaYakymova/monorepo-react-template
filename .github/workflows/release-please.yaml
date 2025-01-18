@@ -22,6 +22,8 @@ jobs:
         run: npm run install-all
 
       - name: Run Release Please
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release-please
 
       # Добавляем шаг для коммита и пуша изменений в changelog
