@@ -21,7 +21,7 @@ interface ButtonStylesConfig {
     [key: string]: string | undefined;
   };
 }
-
+console.log('new feat')
 interface ButtonProps extends React.ComponentPropsWithoutRef<any> {
   bgColor?: string;
   btnName?: string | React.ReactNode;
