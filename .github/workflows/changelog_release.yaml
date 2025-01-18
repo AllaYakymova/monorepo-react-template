@@ -84,7 +84,7 @@ jobs:
 
       # 6. Закоммитить изменения в changelog
       - name: Commit changelog updates
-        if: env.CHANGES == 'true'
+        if: env.changes == 'true'
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
@@ -93,7 +93,7 @@ jobs:
       
       # 7. Запушить изменения
       - name: Push changelog to repository
-        if: env.CHANGES == 'true'
+        if: env.changes == 'true'
         run: |
           git push origin HEAD
 
@@ -171,11 +171,20 @@ jobs:
           # Генерация CHANGELOG.md для plugin-1
           npm run changelog:plugin-1
 
-      # - name: Set up GitHub authentication
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+      # 6. Закоммитить изменения в changelog
+      - name: Commit changelog updates
+        if: env.changes == 'true'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add packages/plugin-1/CHANGELOG.md
+          git commit -m "chore(plugin-1): update changelog [skip ci]" || echo "No changes to commit"
+      
+      # 7. Запушить изменения
+      - name: Push changelog to repository
+        if: env.changes == 'true'
+        run: |
+          git push origin HEAD
 
       # 6.2 Создать релиз для plugin-1, если есть изменения
       - name: Create GitHub Release for plugin-1
