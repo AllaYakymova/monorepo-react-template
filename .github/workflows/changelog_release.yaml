@@ -242,9 +242,10 @@ jobs:
       # 6.2 Создать релиз для root, если есть изменения
       - name: Create GitHub Release for root
         if: env.changes == 'true'
-        uses: actions/create-release@v1.1.3
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: root-v${{ github.run_id }}
           release_name: root Release v${{ github.run_id }}
           draft: true
