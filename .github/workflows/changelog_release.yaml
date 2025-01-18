@@ -230,11 +230,11 @@ jobs:
           # Генерация CHANGELOG.md для root
           npm run changelog:root
 
-      # - name: Set up GitHub authentication
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
+      - name: Set up GitHub authentication
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${GITHUB_TOKEN}" > .npmrc
 
       # 6.2 Создать релиз для root, если есть изменения
       - name: Create GitHub Release for root
