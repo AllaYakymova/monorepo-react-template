@@ -2,47 +2,44 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-// Функция для получения данных о авторе из git
-const getGitAuthor = () => {
-    return execSync("git config user.name").toString().trim();
+// Функция для безопасного выполнения команды
+const safeExecSync = (command) => {
+    try {
+        return execSync(command).toString().trim();
+    } catch (error) {
+        return "unknown"; // Возвращаем "unknown", если команда не выполнена
+    }
 };
 
-// Функция для получения номера PR (если работает в CI)
-const getPRNumber = () => {
-    const prNumber = process.env.PR_NUMBER; // Для GitHub Actions можно использовать переменные окружения
-    return prNumber || "unknown";
-};
-
-// Основной скрипт
 const createMetaFile = () => {
     const changesetDir = path.resolve(".changeset");
-    const files = fs.readdirSync(changesetDir).filter((file) => file.endsWith(".md"));
+    const files = fs.readdirSync(changesetDir).filter(file => file.endsWith(".md"));
 
-    files.forEach((file) => {
+    files.forEach(file => {
         const changesetPath = path.join(changesetDir, file);
-
-        // Читаем содержимое changeset
         const changesetContent = fs.readFileSync(changesetPath, "utf-8");
 
-        // Извлекаем пакеты и тип изменений
+        // Считываем измененные пакеты и тип изменений
         const packages = changesetContent
             .split("\n")
-            .filter((line) => line.startsWith("- "))
-            .map((line) => {
-                const [name, type] = line.replace("- ", "").split(": ").map((s) => s.trim());
+            .filter(line => line.startsWith("- "))
+            .map(line => {
+                const [name, type] = line.replace("- ", "").split(": ");
                 return { name, type };
             });
 
-        // Создаем объект мета-данных
+        // Получаем автора и коммит безопасно
         const meta = {
             changeset: path.basename(file, ".md"),
-            author: getGitAuthor(),
-            pr_number: getPRNumber(),
+            author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
-            packages,
+            pr_number: process.env.PR_NUMBER || "unknown",
+            commit: safeExecSync("git rev-parse HEAD"),
+            description: changesetContent.split("\n\n")[1]?.trim() || "No description",
+            packages
         };
 
-        // Записываем мета-данные в JSON
+        // Записываем в JSON
         const metaFilePath = path.join(changesetDir, `${path.basename(file, ".md")}.meta.json`);
         fs.writeFileSync(metaFilePath, JSON.stringify(meta, null, 2));
         console.log(`Meta file created: ${metaFilePath}`);

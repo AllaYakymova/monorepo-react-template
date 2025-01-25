@@ -6,7 +6,7 @@ on:
       - opened
       - edited
       - reopened
-      # - synchronize
+      - synchronize
       # - ready_for_review
     # paths:
   #     - 'packages/**'   # Следим за изменениями в папке с пакетами
@@ -26,9 +26,15 @@ jobs:
         with:
           node-version: '20'  # Укажите вашу версию Node.js
 
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
       - name: Install dependencies
         run: |
           npm install
+      
 
       - name: Generate meta files for changesets
         run: |
