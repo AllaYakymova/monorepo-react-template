@@ -36,12 +36,16 @@ jobs:
           npm install
       
 
-      - name: Generate meta files for changesets
+      - name: Generate meta file for changeset
         run: |
           node create-meta-file.js
           git add .changeset/*.meta.json
-          git commit -m "Add meta files for changesets"
-          git push
+          git commit -m "Add meta file for changeset"
+
+      - name: Push changes to PR branch
+        run: |
+          # Убедитесь, что изменения отправляются в ветку PR
+          git push origin HEAD:${{ github.head_ref }}
 
 
       # - name: Automatically create changeset
