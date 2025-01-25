@@ -7,6 +7,7 @@
 /*-- Apply this component styles --*/
 import myStyles from '@/components/Buttons/styles/index.module.scss';
 
+console.log('some new logging')
 interface ButtonStylesConfig {
   info?: {
     [key: string]: string | undefined;

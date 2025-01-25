@@ -13,10 +13,5 @@
     "packages/front-end",
     "packages/plugin-1",
     ""
-  ],
-  "changelog": {
-    "preset": "angular",
-    "repo": "AllaYakymova/monorepo-react-template",
-    "commit": false
-  },
+  ]
 }
