@@ -1,8 +1,14 @@
 name: Create Changeset
 
 on:
-  # pull_request:
-  #   paths:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      # - ready_for_review
+    # paths:
   #     - 'packages/**'   # Следим за изменениями в папке с пакетами
   workflow_dispatch: {
 
@@ -20,54 +26,75 @@ jobs:
         with:
           node-version: '20'  # Укажите вашу версию Node.js
 
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
       - name: Install dependencies
         run: |
           npm install
+      
 
-      - name: Automatically create changeset
+      - name: Generate meta file for changeset
         run: |
-         # Находим все измененные пакеты (папки), создаем changeset для каждого
-          CHANGED_PACKAGES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^packages/' | cut -d '/' -f2 | sort | uniq)
+          node create-meta-file.js
+          git add .changeset/*.meta.json
+          git commit -m "Add meta file for changeset"
+
+      - name: Pull remote changes (to avoid conflicts)
+        run: |
+          git pull --rebase origin ${{ github.head_ref }}
+
+      - name: Push changes to PR branch
+        run: |
+          git push origin HEAD:${{ github.head_ref }}
+
+
+      # - name: Automatically create changeset
+      #   run: |
+      #    # Находим все измененные пакеты (папки), создаем changeset для каждого
+      #     CHANGED_PACKAGES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^packages/' | cut -d '/' -f2 | sort | uniq)
           
-          # Проверяем, если пакеты изменились
-          if [ -z "$CHANGED_PACKAGES" ]; then
-            echo "No changes in packages found, skipping changeset creation."
-          else
-            # Создаем changeset для каждого измененного пакета
-            for package in $CHANGED_PACKAGES; do
-              echo "Creating changeset for package: $package"
-              npx changeset add "$package" --type minor --message "Automated change for $package"
-            done
-          fi
+      #     # Проверяем, если пакеты изменились
+      #     if [ -z "$CHANGED_PACKAGES" ]; then
+      #       echo "No changes in packages found, skipping changeset creation."
+      #     else
+      #       # Создаем changeset для каждого измененного пакета
+      #       for package in $CHANGED_PACKAGES; do
+      #         echo "Creating changeset for package: $package"
+      #         npx changeset add "$package" --type minor --message "Automated change for $package"
+      #       done
+      #     fi
 
-      - name: Commit and push changesets
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .changeset/
-          git commit -m "Automated changesets for updated packages"
-          git push origin ${{ github.head_ref }}
+      # - name: Commit and push changesets
+      #   run: |
+      #     git config user.name "GitHub Actions"
+      #     git config user.email "actions@github.com"
+      #     git add .changeset/
+      #     git commit -m "Automated changesets for updated packages"
+      #     git push origin ${{ github.head_ref }}
 
-  version-publish:
-    needs: create-changeset
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  # version-publish:
+  #   needs: create-changeset
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '20'
 
-      - name: Install dependencies
-        run: |
-          npm run install-all
+  #     - name: Install dependencies
+  #       run: |
+  #         npm run install-all
 
-      - name: Run Changeset Version
-        run: |
-          npm run changeset-version
+      # - name: Run Changeset Version
+      #   run: |
+      #     npm run changeset-version
 
-      - name: Run Changeset Publish
-        run: |
-          npm run changeset-publish
+      # - name: Run Changeset Publish
+      #   run: |
+      #     npm run changeset-publish
