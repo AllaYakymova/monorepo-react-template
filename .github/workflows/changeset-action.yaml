@@ -14,10 +14,10 @@ on:
 
   }    
 
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
-  env:
-    GH_TOKEN: ${{ github.token }}
-    
   create-changeset:
     runs-on: ubuntu-latest
     steps:
