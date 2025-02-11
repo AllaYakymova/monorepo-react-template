@@ -51,7 +51,7 @@ jobs:
           git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
 
           # Get the list of changed files between the PR branch and the base branch
-          CHANGED_MD_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }}) | grep -q '^.changeset/.*\.md$' || echo "")
+          CHANGED_MD_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep -q '^.changeset/.*\.md$' || echo "")
 
           echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
           echo "Changed .md files: $CHANGED_MD_FILES"
