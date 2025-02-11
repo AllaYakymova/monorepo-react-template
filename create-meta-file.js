@@ -42,7 +42,7 @@ const extractIssueNumberFromBranch = () => {
 const createMetaFile = () => {
     // Получаем имя changeset файла из аргументов командной строки
     const changesetName = process.argv[2];
-    console.loh("!!!!!!! ", process.argv)
+    console.log("!!!!!!! ", process.argv)
     if (!changesetName) {
         console.error("Error: No changeset name provided.");
         process.exit(1);
