@@ -52,7 +52,7 @@ jobs:
 
           # Get the list of changed files between the PR branch and the base branch
           # Получаем измененные файлы между базовой веткой и текущей веткой PR
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^.changeset/.*\.md$' || echo "")
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^\.changeset/[^/]\+\.md$' || echo "")
 
           # Выводим список измененных файлов в лог
           echo "Changed .md files: $CHANGED_FILES"
