@@ -1,0 +1,15 @@
+{
+  "changeset": "slimy-eggs-arrive",
+  "date": "2025-02-11T14:43:56.406Z",
+  "pr_number": "unknown",
+  "commit": "27671f4edea5f6bcfb22f466d75b1a5b9e5a16b0",
+  "issue_number": null,
+  "issue_ink": null,
+  "description": "Add p tag to front-end",
+  "packages": [
+    {
+      "name": "front-end",
+      "type": "patch"
+    }
+  ]
+}
