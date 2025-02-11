@@ -33,31 +33,10 @@ const parsePackagesFromChangeset = (changesetContent) => {
 // Функция для извлечения номера issue из названия ветки
 const extractIssueNumberFromBranch = () => {
     const branchName = process.env.GITHUB_HEAD_REF || safeExecSync("git rev-parse --abbrev-ref HEAD");
-    console.log({ GITHUB_HEAD_REF: process.env.GITHUB_HEAD_REF, branchName })
+   
     const match = branchName.match(/issue-(\d+)/); // regex for searching "issue-<number>"
     const issue_number = match && match[1] // "unknown"; // return issue number or "unknown", if no match detected
     return [issue_number, issue_number ? `https://github.com/AllaYakymova/monorepo-react-template/issues/${issue_number}` : null]
-};
-
-// Функция для извлечения номера PR из коммитов
-const extractPRNumberFromCommits = () => {
-    const logMessage = safeExecSync("git log -1 --pretty=%B"); // Получаем последнее сообщение коммита
-    const match = logMessage.match(/\(#(\d+)\)/); // Регулярное выражение для поиска "(#<PR_number>)"
-    console.log('logMessage ', { logMessage, match })
-    return match ? match[1] : "unknown"; // Возвращаем номер PR или "unknown", если номер не найден
-};
-
-const getPRNumber = () => {
-    try {
-        const prNumber = execSync("gh pr view --json number -q '.number'")
-            .toString()
-            .trim();
-        console.log({ prNumber })
-        return prNumber;
-    } catch (error) {
-        console.log({ error })
-        return "unknown"; // Если команда не выполнена
-    }
 };
 
 const createMetaFile = () => {
@@ -72,14 +51,14 @@ const createMetaFile = () => {
 
         // Считываем измененные пакеты и тип изменений
         const packages = parsePackagesFromChangeset(changesetContent)
-        extractPRNumberFromCommits()
+       
         // Получаем автора и коммит безопасно
         const meta = {
             changeset: path.basename(file, ".md"),
             // author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
             pr_number: process.env.PR_NUMBER || "unknown",
-            commit: safeExecSync("git rev-parse HEAD"),
+            // commit: safeExecSync("git rev-parse HEAD"),
             issue_number: extractIssueNumberFromBranch()?.[0], // add issue number
             issue_ink: extractIssueNumberFromBranch()?.[1],
             description: changesetContent.split("\n\n")[1]?.trim() || "No description",
