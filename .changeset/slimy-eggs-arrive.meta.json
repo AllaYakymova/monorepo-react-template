@@ -1,8 +1,8 @@
 {
   "changeset": "slimy-eggs-arrive",
-  "date": "2025-02-11T16:18:52.201Z",
+  "date": "2025-02-11T16:33:22.195Z",
   "pr_number": "unknown",
-  "commit": "dd7b0b87edc224ec255ce86c9087d2c78b0efaee",
+  "commit": "3fcd3e84f3f173d27d46a9bd633e74a196432fb6",
   "issue_number": "333",
   "issue_ink": "https://github.com/AllaYakymova/monorepo-react-template/issues/333",
   "description": "Add p tag to front-end",
