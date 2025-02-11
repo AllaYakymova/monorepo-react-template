@@ -1,0 +1,14 @@
+{
+  "changeset": "moody-waves-reflect",
+  "date": "2025-02-11T21:50:30.502Z",
+  "pr_number": "32",
+  "issue_number": "999",
+  "issue_ink": "https://github.com/AllaYakymova/monorepo-react-template/issues/999",
+  "description": "Change\n- Clean up changesets files",
+  "packages": [
+    {
+      "name": "root",
+      "type": "patch"
+    }
+  ]
+}
