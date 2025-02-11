@@ -48,25 +48,10 @@ jobs:
       - name: Get changed .changeset/*.md files
         id: get-changed-files
         run: |
-          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-          git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
-
-          # Get the list of changed files between the PR branch and the base branch
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
-
-          # Check if any .changeset/*.md files are present in the changes
-          if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
-            echo "changeset_files_found=true" >> $GITHUB_ENV
-          else
-            echo "changeset_files_found=false" >> $GITHUB_ENV
+          # Получаем список измененных .md файлов
+          CHANGED_MD_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^.changeset/.*\.md$' || echo "")
           echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
           echo "Changed files: $CHANGED_MD_FILES"
-          
-          
-          # # Получаем список измененных .md файлов
-          # CHANGED_MD_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^.changeset/.*\.md$' || echo "")
-          # echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
-          # echo "Changed files: $CHANGED_MD_FILES"
 
       # Шаг 5: Генерируем meta.json только для измененных файлов
       - name: Generate meta files for changed changesets
@@ -80,7 +65,15 @@ jobs:
             node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
           done
       
-      #  - name: Check for .changeset/*.md files
+      # Шаг 6: Коммитим и пушим изменения
+      - name: Commit and push meta.json files
+        if: env.CHANGED_MD_FILES != ''
+        run: |
+          git add .changeset/*.meta.json
+          git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
+          git push origin HEAD:${{ github.head_ref }}
+
+      # - name: Check for .changeset/*.md files
       #   id: check-changeset
       #   run: |
       #     # Fetch the base branch to ensure it's available
@@ -96,15 +89,6 @@ jobs:
       #     else
       #       echo "changeset_files_found=false" >> $GITHUB_ENV
       #     fi
-      
-      # Шаг 6: Коммитим и пушим изменения
-      - name: Commit and push meta.json files
-        if: env.CHANGED_MD_FILES != ''
-        run: |
-          git add .changeset/*.meta.json
-          git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
-          git push origin HEAD:${{ github.head_ref }}
-
 
       # - name: Generate meta file for changeset
       #   if: env.changeset_files_found == 'true'
