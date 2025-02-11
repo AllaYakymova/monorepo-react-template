@@ -35,18 +35,30 @@ jobs:
         run: |
           npm install
       
+      - name: Check for .changeset/*.md files
+        id: check-changeset
+        run: |
+          # check if there any changes in .changeset/*.md
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^.changeset/.*\.md$'; then
+            echo "changeset_files_found=true" >> $GITHUB_ENV
+          else
+            echo "changeset_files_found=false" >> $GITHUB_ENV
+          fi
 
       - name: Generate meta file for changeset
+        if: env.changeset_files_found == 'true'
         run: |
           node create-meta-file.js
           git add .changeset/*.meta.json
           git commit -m "Add meta file for changeset"
 
       - name: Pull remote changes (to avoid conflicts)
+        if: env.changeset_files_found == 'true'
         run: |
           git pull --rebase origin ${{ github.head_ref }}
 
       - name: Push changes to PR branch
+        if: env.changeset_files_found == 'true'
         run: |
           git push origin HEAD:${{ github.head_ref }}
 
