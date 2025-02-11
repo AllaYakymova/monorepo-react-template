@@ -15,6 +15,10 @@
           "changelog": "packages/plugin-1/CHANGELOG.md"
         },
         {
+          "name": "plugin-2",
+          "changelog": "packages/plugin-component/CHANGELOG.md"
+        },
+        {
           "name": "root",
           "changelog": "CHANGELOG.md"
         }
