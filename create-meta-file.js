@@ -12,6 +12,24 @@ const safeExecSync = (command) => {
     }
 };
 
+// Функция для парсинга изменённых пакетов и типов изменений
+const parsePackagesFromChangeset = (changesetContent) => {
+    const yamlPart = changesetContent.split("---")[1]; // Извлекаем содержимое между `---`
+    if (!yamlPart) {
+        return []; // Возвращаем пустой массив, если YAML не найден
+    }
+
+    return yamlPart
+        .trim()
+        .split("\n")
+        .filter(line => line.includes(":")) // Учитываем только строки с `package: type`
+        .map(line => {
+            const [name, type] = line.replace(/"/g, "").split(":").map(s => s.trim());
+            return { name, type };
+        });
+};
+
+
 // Функция для извлечения номера issue из названия ветки
 const extractIssueNumberFromBranch = () => {
     const branchName = safeExecSync("git rev-parse --abbrev-ref HEAD");
@@ -36,20 +54,15 @@ const createMetaFile = () => {
         if (file.includes('README')) return;
         const changesetPath = path.join(changesetDir, file);
         const changesetContent = fs.readFileSync(changesetPath, "utf-8");
+        console.log({ changesetContent })
 
         // Считываем измененные пакеты и тип изменений
-        const packages = changesetContent
-            .split("\n")
-            .filter(line => line.startsWith("- "))
-            .map(line => {
-                const [name, type] = line.replace("- ", "").split(": ");
-                return { name, type };
-            });
+        const packages = parsePackagesFromChangeset(changesetContent)
   
         // Получаем автора и коммит безопасно
         const meta = {
             changeset: path.basename(file, ".md"),
-            author: safeExecSync("git config user.name"),
+            // author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
             pr_number: extractPRNumberFromCommits(),
             commit: safeExecSync("git rev-parse HEAD"),
