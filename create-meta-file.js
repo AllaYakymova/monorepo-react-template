@@ -33,6 +33,7 @@ const createMetaFile = () => {
     const files = fs.readdirSync(changesetDir).filter(file => file.endsWith(".md"));
 
     files.forEach(file => {
+        if (file.includes('README')) return;
         const changesetPath = path.join(changesetDir, file);
         const changesetContent = fs.readFileSync(changesetPath, "utf-8");
 
