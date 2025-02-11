@@ -38,9 +38,9 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      # 4. Установить зависимости проекта
-      - name: Install dependencies
-        run: npm install
+      # # 4. Установить зависимости проекта
+      # - name: Install dependencies
+      #   run: npm install
 
       # 5. Извлечение измененных или добавленных .md файлов
       - name: Get changed .changeset/*.md files
@@ -51,13 +51,19 @@ jobs:
           git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
 
           # Get the list of changed files between the PR branch and the base branch
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
-          echo "CHANGED_FILES: $CHANGED_FILES"
-          # Check if any .changeset/*.md files are present in the changes
-          if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
-            echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
+          # Получаем измененные файлы между базовой веткой и текущей веткой PR
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^.changeset/.*\.md$' || echo "")
+
+          # Выводим список измененных файлов в лог
+          echo "Changed .md files: $CHANGED_FILES"
+
+          # Записываем в переменную окружения, если есть измененные файлы
+          if [[ -n "$CHANGED_FILES" ]]; then
+            # Переводим список файлов в строку через пробел (чтобы избежать ошибок записи в $GITHUB_ENV)
+            CHANGED_FILES_FORMATTED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
+            echo "CHANGED_FILES=$CHANGED_FILES_FORMATTED" >> $GITHUB_ENV
           else
-            echo "$CHANGED_FILES=''" >> $GITHUB_ENV
+            echo "CHANGED_FILES=" >> $GITHUB_ENV
           fi
 
       # 6. Генерация или обновление meta.json для каждого измененного файла
