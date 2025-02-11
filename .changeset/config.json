@@ -3,8 +3,22 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "username/repo",
-      "customChangelogFile": "CHANGELOG.md"
+      "repo": "AllaYakymova/monorepo-react-template",
+      "customChangelogFile": "CHANGELOG.md",
+      "packages": [
+        {
+          "name": "front-end",
+          "changelog": "packages/front-end/CHANGELOG.md"
+        },
+        {
+          "name": "plugin-1",
+          "changelog": "packages/plugin-1/CHANGELOG.md"
+        },
+        {
+          "name": "root",
+          "changelog": "CHANGELOG.md"
+        }
+      ]
     }
   ],
   "commit": false,
