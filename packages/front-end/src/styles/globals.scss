@@ -5,7 +5,7 @@
 .clearfix {
   &:before {
     content: " ";
-    display: table;
+    display: table !important;
   }
 
   &:after {
