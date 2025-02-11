@@ -1,15 +1,18 @@
 name: Create Changeset
 
 on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - reopened
-      - synchronize
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - edited
+  #     - reopened
+  #     - synchronize
       # - ready_for_review
     # paths:
   #     - 'packages/**'   # Следим за изменениями в папке с пакетами
+  push:
+    paths:
+      - ".changeset/*.md" 
   workflow_dispatch: {
 
   }    
