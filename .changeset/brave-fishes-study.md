@@ -1,5 +1,6 @@
 ---
 "front-end": patch
+"root": patch
 ---
 
 Added:
