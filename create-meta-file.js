@@ -33,6 +33,7 @@ const parsePackagesFromChangeset = (changesetContent) => {
 // Функция для извлечения номера issue из названия ветки
 const extractIssueNumberFromBranch = () => {
     const branchName = safeExecSync("git rev-parse --abbrev-ref HEAD");
+    console.log({ branchName })
     const match = branchName.match(/issue-(\d+)/); // regex for searching "issue-<number>"
     const issue_number = match && match[1] // "unknown"; // return issue number or "unknown", if no match detected
     return [issue_number, issue_number ? `https://github.com/AllaYakymova/monorepo-react-template/issues/${issue_number}` : null]
@@ -42,7 +43,7 @@ const extractIssueNumberFromBranch = () => {
 const extractPRNumberFromCommits = () => {
     const logMessage = safeExecSync("git log -1 --pretty=%B"); // Получаем последнее сообщение коммита
     const match = logMessage.match(/\(#(\d+)\)/); // Регулярное выражение для поиска "(#<PR_number>)"
-    console.log('logMessage ', { match })
+    console.log('logMessage ', { logMessage, match })
     return match ? match[1] : "unknown"; // Возвращаем номер PR или "unknown", если номер не найден
 };
 
