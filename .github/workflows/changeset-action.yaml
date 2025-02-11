@@ -46,15 +46,22 @@ jobs:
       - name: Get changed .changeset/*.md files
         id: get-changed-files
         run: |
+        #   - name: Check for .changeset/*.md files
+        # id: check-changeset
+        # run: |
           # Fetch the base branch to ensure it's available
           git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
           git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
 
           # Get the list of changed files between the PR branch and the base branch
-          CHANGED_MD_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep -q '^.changeset/.*\.md$' || echo "")
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
 
-          echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
-          echo "Changed .md files: $CHANGED_MD_FILES"
+          # Check if any .changeset/*.md files are present in the changes
+          if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
+            echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
+          else
+            echo "$CHANGED_FILES="" >> $GITHUB_ENV
+          fi
 
       # 6. Генерация или обновление meta.json для каждого измененного файла
       - name: Generate or update meta.json for changesets
