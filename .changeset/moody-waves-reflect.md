@@ -1,5 +1,5 @@
 ---
-"root": patch
+"monorepo-react-template": patch
 ---
 
 Change

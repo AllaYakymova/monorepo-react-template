@@ -19,7 +19,7 @@
           "changelog": "packages/plugin-component/CHANGELOG.md"
         },
         {
-          "name": "root",
+          "name": "monorepo-react-template",
           "changelog": "CHANGELOG.md"
         }
       ]
@@ -53,7 +53,7 @@
         "changelog": "packages/plugin-2/CHANGELOG.md"
       },
       {
-        "name": "root",
+        "name": "monorepo-react-template",
         "changelog": "CHANGELOG.md"
       }
     ]

@@ -7,7 +7,7 @@
   "description": "Change\n- Clean up changesets files",
   "packages": [
     {
-      "name": "root",
+      "name": "monorepo-react-template",
       "type": "patch"
     }
   ]

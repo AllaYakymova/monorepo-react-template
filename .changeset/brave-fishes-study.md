@@ -1,6 +1,6 @@
 ---
 "front-end": patch
-"root": patch
+"monorepo-react-template": patch
 ---
 
 Added:
