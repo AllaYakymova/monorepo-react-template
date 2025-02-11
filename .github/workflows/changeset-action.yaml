@@ -21,6 +21,7 @@ env:
 
 jobs:
   create-changeset:
+    if: github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
