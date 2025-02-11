@@ -61,40 +61,31 @@ jobs:
           if [[ -n "$CHANGED_FILES" ]]; then
             # Переводим список файлов в строку через пробел (чтобы избежать ошибок записи в $GITHUB_ENV)
             CHANGED_FILES_FORMATTED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
-            echo "CHANGED_FILES=$CHANGED_FILES_FORMATTED" >> $GITHUB_ENV
+            echo "CHANGED_MD_FILES=$CHANGED_FILES_FORMATTED" >> $GITHUB_ENV
           else
-            echo "CHANGED_FILES=" >> $GITHUB_ENV
+            echo "CHANGED_MD_FILES=" >> $GITHUB_ENV
           fi
 
-      # 6. Генерация или обновление meta.json для каждого измененного файла
-      - name: Generate or update meta.json for changesets
+       # Шаг 6: Генерируем meta.json только для измененных файлов
+      - name: Generate meta files for changed changesets
         if: env.CHANGED_MD_FILES != ''
         run: |
-          echo "Processing changed .md files: $CHANGED_MD_FILES"
+          echo "Changed .md files: $CHANGED_MD_FILES"
           for file in $CHANGED_MD_FILES; do
             echo "Processing $file..."
-            # Извлекаем имя файла без расширения .md
+            # Убираем расширение .md, чтобы получить имя для meta.json
             BASENAME=$(basename "$file" .md)
-            META_FILE=".changeset/${BASENAME}.meta.json"
-            
-            # Проверяем, существует ли meta.json файл
-            if [ -f "$META_FILE" ]; then
-              echo "Updating existing $META_FILE..."
-              node create-meta-file.js "$BASENAME" --update # Передаем флаг обновления
-            else
-              echo "Creating new $META_FILE..."
-              node create-meta-file.js "$BASENAME" # Создаем новый meta.json файл
-            fi
+            node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
           done
-
-      # 7. Добавить изменения и закоммитить
-      - name: Commit changes
+      
+      # Шаг 7: Коммитим и пушим изменения
+      - name: Commit meta.json file
         if: env.CHANGED_MD_FILES != ''
         run: |
           git add .changeset/*.meta.json
-          git commit -m "Add or update meta files for changesets"
+          git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
 
-      # 8. Избежать конфликтов с удаленными изменениями
+       # 8. Избежать конфликтов с удаленными изменениями
       - name: Pull remote changes (to avoid conflicts)
         if: env.CHANGED_MD_FILES != ''
         run: |
@@ -105,6 +96,46 @@ jobs:
         if: env.CHANGED_MD_FILES != ''
         run: |
           git push origin HEAD:${{ github.head_ref }}
+
+      # # 6. Генерация или обновление meta.json для каждого измененного файла
+      # - name: Generate or update meta.json for changesets
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     echo "Processing changed .md files: $CHANGED_MD_FILES"
+      #     for file in $CHANGED_MD_FILES; do
+      #       echo "Processing $file..."
+      #       # Извлекаем имя файла без расширения .md
+      #       BASENAME=$(basename "$file" .md)
+      #       META_FILE=".changeset/${BASENAME}.meta.json"
+            
+      #       # Проверяем, существует ли meta.json файл
+      #       if [ -f "$META_FILE" ]; then
+      #         echo "Updating existing $META_FILE..."
+      #         node create-meta-file.js "$BASENAME" --update # Передаем флаг обновления
+      #       else
+      #         echo "Creating new $META_FILE..."
+      #         node create-meta-file.js "$BASENAME" # Создаем новый meta.json файл
+      #       fi
+      #     done
+
+      # # 7. Добавить изменения и закоммитить
+      # - name: Commit changes
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git add .changeset/*.meta.json
+      #     git commit -m "Add or update meta files for changesets"
+
+      # # 8. Избежать конфликтов с удаленными изменениями
+      # - name: Pull remote changes (to avoid conflicts)
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git pull --rebase origin ${{ github.head_ref }}
+
+      # # 9. Запушить изменения в PR ветку
+      # - name: Push changes to PR branch
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git push origin HEAD:${{ github.head_ref }}
 
 
 # name: Create Changeset
