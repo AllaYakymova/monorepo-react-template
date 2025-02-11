@@ -78,7 +78,7 @@ const createMetaFile = () => {
             changeset: path.basename(file, ".md"),
             // author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
-            pr_number: getPRNumber(),
+            pr_number: process.env.PR_NUMBER || "unknown",
             commit: safeExecSync("git rev-parse HEAD"),
             issue_number: extractIssueNumberFromBranch()?.[0], // add issue number
             issue_ink: extractIssueNumberFromBranch()?.[1],

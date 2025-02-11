@@ -16,6 +16,8 @@ on:
 
 env:
   GH_TOKEN: ${{ github.token }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  GITHUB_HEAD_REF: ${{ github.head_ref }}
 
 jobs:
   create-changeset:
