@@ -12,6 +12,7 @@ export default function Document() {
         </Head>
       <body>
         <Main />
+        <p>some important stuff added into front-end package</p>
         <NextScript />
       </body>
     </Html>
