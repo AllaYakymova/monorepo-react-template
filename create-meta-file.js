@@ -47,6 +47,17 @@ const extractPRNumberFromCommits = () => {
     return match ? match[1] : "unknown"; // Возвращаем номер PR или "unknown", если номер не найден
 };
 
+const getPRNumber = () => {
+    try {
+        const prNumber = execSync("gh pr view --json number -q '.number'")
+            .toString()
+            .trim();
+        return prNumber;
+    } catch (error) {
+        return "unknown"; // Если команда не выполнена
+    }
+};
+
 const createMetaFile = () => {
     const changesetDir = path.resolve(".changeset");
     const files = fs.readdirSync(changesetDir).filter(file => file.endsWith(".md"));
@@ -65,7 +76,7 @@ const createMetaFile = () => {
             changeset: path.basename(file, ".md"),
             // author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
-            pr_number: extractPRNumberFromCommits(),
+            pr_number: getPRNumber(),
             commit: safeExecSync("git rev-parse HEAD"),
             issue_number: extractIssueNumberFromBranch()?.[0], // add issue number
             issue_ink: extractIssueNumberFromBranch()?.[1],
