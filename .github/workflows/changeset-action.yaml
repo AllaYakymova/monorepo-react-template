@@ -44,39 +44,68 @@ jobs:
         run: |
           npm install
       
-      - name: Check for .changeset/*.md files
-        id: check-changeset
+      # Шаг 4: Извлекаем измененные файлы .md
+      - name: Get changed .changeset/*.md files
+        id: get-changed-files
         run: |
-          # Fetch the base branch to ensure it's available
-          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-          git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
+          # Получаем список измененных .md файлов
+          CHANGED_MD_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^.changeset/.*\.md$' || echo "")
+          echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
+          echo "Changed files: $CHANGED_MD_FILES"
 
-          # Get the list of changed files between the PR branch and the base branch
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
-
-          # Check if any .changeset/*.md files are present in the changes
-          if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
-            echo "changeset_files_found=true" >> $GITHUB_ENV
-          else
-            echo "changeset_files_found=false" >> $GITHUB_ENV
-          fi
-
-      - name: Generate meta file for changeset
-        if: env.changeset_files_found == 'true'
+      # Шаг 5: Генерируем meta.json только для измененных файлов
+      - name: Generate meta files for changed changesets
+        if: env.CHANGED_MD_FILES != ''
         run: |
-          node create-meta-file.js
+          echo "Changed .md files: $CHANGED_MD_FILES"
+          for file in $CHANGED_MD_FILES; do
+            echo "Processing $file..."
+            # Убираем расширение .md, чтобы получить имя для meta.json
+            BASENAME=$(basename "$file" .md)
+            node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
+          done
+      
+      # Шаг 6: Коммитим и пушим изменения
+      - name: Commit and push meta.json files
+        if: env.CHANGED_MD_FILES != ''
+        run: |
           git add .changeset/*.meta.json
-          git commit -m "Add meta file for changeset"
-
-      - name: Pull remote changes (to avoid conflicts)
-        if: env.changeset_files_found == 'true'
-        run: |
-          git pull --rebase origin ${{ github.head_ref }}
-
-      - name: Push changes to PR branch
-        if: env.changeset_files_found == 'true'
-        run: |
+          git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
           git push origin HEAD:${{ github.head_ref }}
+
+      # - name: Check for .changeset/*.md files
+      #   id: check-changeset
+      #   run: |
+      #     # Fetch the base branch to ensure it's available
+      #     git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+      #     git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
+
+      #     # Get the list of changed files between the PR branch and the base branch
+      #     CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
+
+      #     # Check if any .changeset/*.md files are present in the changes
+      #     if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
+      #       echo "changeset_files_found=true" >> $GITHUB_ENV
+      #     else
+      #       echo "changeset_files_found=false" >> $GITHUB_ENV
+      #     fi
+
+      # - name: Generate meta file for changeset
+      #   if: env.changeset_files_found == 'true'
+      #   run: |
+      #     node create-meta-file.js
+      #     git add .changeset/*.meta.json
+      #     git commit -m "Add meta file for changeset"
+
+      # - name: Pull remote changes (to avoid conflicts)
+      #   if: env.changeset_files_found == 'true'
+      #   run: |
+      #     git pull --rebase origin ${{ github.head_ref }}
+
+      # - name: Push changes to PR branch
+      #   if: env.changeset_files_found == 'true'
+      #   run: |
+      #     git push origin HEAD:${{ github.head_ref }}
 
 
       # - name: Automatically create changeset
