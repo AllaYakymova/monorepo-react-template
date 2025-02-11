@@ -38,10 +38,11 @@ jobs:
       - name: Check for .changeset/*.md files
         id: check-changeset
         run: |
-          # Fetch the head branch to ensure it's available
+          # Fetch the base branch to ensure it's available
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
           git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
-          
-          # Get the list of changed files between the base branch and the PR branch
+
+          # Get the list of changed files between the PR branch and the base branch
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
 
           # Check if any .changeset/*.md files are present in the changes
