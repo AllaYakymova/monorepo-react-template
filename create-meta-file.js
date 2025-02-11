@@ -52,11 +52,15 @@ const createMetaFile = () => {
     const metaFilePath = `.changeset/${changesetName}.meta.json`;
     const changesetContent = fs.readFileSync(changesetFilePath, "utf-8");
 
+    console.log({ changesetContent })
+
     // Проверяем существование changeset файла
     if (!fs.existsSync(changesetFilePath)) {
         console.error(`Error: Changeset file "${changesetFilePath}" does not exist.`);
         process.exit(1);
     }
+
+    const packages = parsePackagesFromChangeset(changesetContent)
 
     // Генерируем meta.json
     const metaData = {
