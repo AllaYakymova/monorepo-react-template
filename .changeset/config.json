@@ -15,7 +15,7 @@
           "changelog": "packages/plugin-1/CHANGELOG.md"
         },
         {
-          "name": "plugin-2",
+          "name": "plugin-component",
           "changelog": "packages/plugin-component/CHANGELOG.md"
         },
         {
@@ -47,6 +47,10 @@
       {
         "name": "plugin-1",
         "changelog": "packages/plugin-1/CHANGELOG.md"
+      },
+      {
+        "name": "plugin-2",
+        "changelog": "packages/plugin-2/CHANGELOG.md"
       },
       {
         "name": "root",
