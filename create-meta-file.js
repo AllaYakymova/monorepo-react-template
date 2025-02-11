@@ -52,8 +52,10 @@ const getPRNumber = () => {
         const prNumber = execSync("gh pr view --json number -q '.number'")
             .toString()
             .trim();
+        console.log({ prNumber })
         return prNumber;
     } catch (error) {
+        console.log({ error })
         return "unknown"; // Если команда не выполнена
     }
 };
@@ -70,7 +72,7 @@ const createMetaFile = () => {
 
         // Считываем измененные пакеты и тип изменений
         const packages = parsePackagesFromChangeset(changesetContent)
-  
+        extractPRNumberFromCommits()
         // Получаем автора и коммит безопасно
         const meta = {
             changeset: path.basename(file, ".md"),
