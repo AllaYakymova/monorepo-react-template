@@ -33,7 +33,7 @@ const parsePackagesFromChangeset = (changesetContent) => {
 // Функция для извлечения номера issue из названия ветки
 const extractIssueNumberFromBranch = () => {
     const branchName = process.env.GITHUB_HEAD_REF || safeExecSync("git rev-parse --abbrev-ref HEAD");
-   
+
     const match = branchName.match(/issue-(\d+)/); // regex for searching "issue-<number>"
     const issue_number = match && match[1] // "unknown"; // return issue number or "unknown", if no match detected
     return [issue_number, issue_number ? `https://github.com/AllaYakymova/monorepo-react-template/issues/${issue_number}` : null]
@@ -42,6 +42,7 @@ const extractIssueNumberFromBranch = () => {
 const createMetaFile = () => {
     // Получаем имя changeset файла из аргументов командной строки
     const changesetName = process.argv[2];
+    console.loh("!!!!!!! ", process.argv)
     if (!changesetName) {
         console.error("Error: No changeset name provided.");
         process.exit(1);
@@ -84,7 +85,7 @@ const createMetaFile = () => {
 
     //     // Считываем измененные пакеты и тип изменений
     //     const packages = parsePackagesFromChangeset(changesetContent)
-       
+
     //     // Получаем автора и коммит безопасно
     //     const meta = {
     //         changeset: path.basename(file, ".md"),

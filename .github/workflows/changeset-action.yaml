@@ -1,111 +1,208 @@
-name: Create Changeset
+name: Create Changeset Meta File
 
 on:
-  # pull_request:
-  #   types:
-  #     - opened
-  #     - edited
-  #     - reopened
-  #     - synchronize
-      # - ready_for_review
-    # paths:
-  #     - 'packages/**'   # Следим за изменениями в папке с пакетами
-  push:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
     paths:
-      - ".changeset/*.md" 
-  workflow_dispatch: {
-
-  }    
+      - ".changeset/*.md"  # Следим за изменениями только в .md файлах в .changeset/
 
 env:
-  GH_TOKEN: ${{ github.token }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PR_NUMBER: ${{ github.event.pull_request.number }}
-  GITHUB_HEAD_REF: ${{ github.head_ref }}
+  GITHUB_HEAD_REF: ${{ github.head_ref }}  # Получаем имя ветки PR
 
 jobs:
-  create-changeset:
+  create-changeset-meta:
     if: github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Checkout репозиторий
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Установка Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Укажите вашу версию Node.js
+          node-version: '20'
 
+      # 3. Установить Git пользователя для действий
       - name: Set up Git user
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
+      # 4. Установить зависимости проекта
       - name: Install dependencies
-        run: |
-          npm install
-      
-      # Шаг 4: Извлекаем измененные файлы .md
+        run: npm install
+
+      # 5. Извлечение измененных или добавленных .md файлов
       - name: Get changed .changeset/*.md files
         id: get-changed-files
         run: |
-          # Получаем список измененных .md файлов
-          CHANGED_MD_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^.changeset/.*\.md$' || echo "")
+          # Получаем список измененных файлов .md между веткой PR и базовой веткой
+          CHANGED_MD_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^.changeset/.*\.md$' || echo "")
           echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
-          echo "Changed files: $CHANGED_MD_FILES"
+          echo "Changed .md files: $CHANGED_MD_FILES"
 
-      # Шаг 5: Генерируем meta.json только для измененных файлов
-      - name: Generate meta files for changed changesets
+      # 6. Генерация или обновление meta.json для каждого измененного файла
+      - name: Generate or update meta.json for changesets
         if: env.CHANGED_MD_FILES != ''
         run: |
-          echo "Changed .md files: $CHANGED_MD_FILES"
+          echo "Processing changed .md files: $CHANGED_MD_FILES"
           for file in $CHANGED_MD_FILES; do
             echo "Processing $file..."
-            # Убираем расширение .md, чтобы получить имя для meta.json
+            # Извлекаем имя файла без расширения .md
             BASENAME=$(basename "$file" .md)
-            node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
+            META_FILE=".changeset/${BASENAME}.meta.json"
+            
+            # Проверяем, существует ли meta.json файл
+            if [ -f "$META_FILE" ]; then
+              echo "Updating existing $META_FILE..."
+              node create-meta-file.js "$BASENAME" --update # Передаем флаг обновления
+            else
+              echo "Creating new $META_FILE..."
+              node create-meta-file.js "$BASENAME" # Создаем новый meta.json файл
+            fi
           done
-      
-      # Шаг 6: Коммитим и пушим изменения
-      - name: Commit and push meta.json files
+
+      # 7. Добавить изменения и закоммитить
+      - name: Commit changes
         if: env.CHANGED_MD_FILES != ''
         run: |
           git add .changeset/*.meta.json
-          git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
+          git commit -m "Add or update meta files for changesets"
+
+      # 8. Избежать конфликтов с удаленными изменениями
+      - name: Pull remote changes (to avoid conflicts)
+        if: env.CHANGED_MD_FILES != ''
+        run: |
+          git pull --rebase origin ${{ github.head_ref }}
+
+      # 9. Запушить изменения в PR ветку
+      - name: Push changes to PR branch
+        if: env.CHANGED_MD_FILES != ''
+        run: |
           git push origin HEAD:${{ github.head_ref }}
 
-      # - name: Check for .changeset/*.md files
-      #   id: check-changeset
+
+# name: Create Changeset
+
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - edited
+#       - reopened
+#       - synchronize
+#       - ready_for_review
+#     # paths:
+#   #     - 'packages/**'   # Следим за изменениями в папке с пакетами
+#   # push:
+#     paths:
+#       - ".changeset/*.md" 
+#   workflow_dispatch: {
+
+#   }    
+
+# env:
+#   GH_TOKEN: ${{ github.token }}
+#   PR_NUMBER: ${{ github.event.pull_request.number }}
+#   GITHUB_HEAD_REF: ${{ github.head_ref }}
+
+# jobs:
+#   create-changeset:
+#     if: github.ref != 'refs/heads/master'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '20'  # Укажите вашу версию Node.js
+
+#       - name: Set up Git user
+#         run: |
+#           git config --global user.name "GitHub Actions Bot"
+#           git config --global user.email "actions@github.com"
+
+#       - name: Install dependencies
+#         run: |
+#           npm install
+
+#       - name: Check for .changeset/*.md files
+#         id: check-changeset
+#         run: |
+#           # Fetch the base branch to ensure it's available
+#           git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+#           git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
+
+#           # Get the list of changed files between the PR branch and the base branch
+#           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
+
+#           # Check if any .changeset/*.md files are present in the changes
+#           if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
+#             echo "changeset_files_found=true" >> $GITHUB_ENV
+#           else
+#             echo "changeset_files_found=false" >> $GITHUB_ENV
+#           fi
+
+#       - name: Generate meta file for changeset
+#         if: env.changeset_files_found == 'true'
+#         run: |
+#           node create-meta-file.js
+#           git add .changeset/*.meta.json
+#           git commit -m "Add meta file for changeset"
+
+#       - name: Pull remote changes (to avoid conflicts)
+#         if: env.changeset_files_found == 'true'
+#         run: |
+#           git pull --rebase origin ${{ github.head_ref }}
+
+#       - name: Push changes to PR branch
+#         if: env.changeset_files_found == 'true'
+#         run: |
+#           git push origin HEAD:${{ github.head_ref }}
+
+
+      # # Шаг 4: Извлекаем измененные файлы .md
+      # - name: Get changed .changeset/*.md files
+      #   id: get-changed-files
       #   run: |
-      #     # Fetch the base branch to ensure it's available
-      #     git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-      #     git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
+      #     # Получаем список измененных .md файлов
+      #     CHANGED_MD_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^.changeset/.*\.md$' || echo "")
+      #     echo "CHANGED_MD_FILES=$CHANGED_MD_FILES" >> $GITHUB_ENV
+      #     echo "Changed files: $CHANGED_MD_FILES"
 
-      #     # Get the list of changed files between the PR branch and the base branch
-      #     CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }})
-
-      #     # Check if any .changeset/*.md files are present in the changes
-      #     if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
-      #       echo "changeset_files_found=true" >> $GITHUB_ENV
-      #     else
-      #       echo "changeset_files_found=false" >> $GITHUB_ENV
-      #     fi
-
-      # - name: Generate meta file for changeset
-      #   if: env.changeset_files_found == 'true'
+      # # Шаг 5: Генерируем meta.json только для измененных файлов
+      # - name: Generate meta files for changed changesets
+      #   if: env.CHANGED_MD_FILES != ''
       #   run: |
-      #     node create-meta-file.js
+      #     echo "Changed .md files: $CHANGED_MD_FILES"
+      #     for file in $CHANGED_MD_FILES; do
+      #       echo "Processing $file..."
+      #       # Убираем расширение .md, чтобы получить имя для meta.json
+      #       BASENAME=$(basename "$file" .md)
+      #       node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
+      #     done
+      
+      # # Шаг 6: Коммитим и пушим изменения
+      # - name: Commit and push meta.json files
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
       #     git add .changeset/*.meta.json
-      #     git commit -m "Add meta file for changeset"
-
-      # - name: Pull remote changes (to avoid conflicts)
-      #   if: env.changeset_files_found == 'true'
-      #   run: |
-      #     git pull --rebase origin ${{ github.head_ref }}
-
-      # - name: Push changes to PR branch
-      #   if: env.changeset_files_found == 'true'
-      #   run: |
+      #     git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
       #     git push origin HEAD:${{ github.head_ref }}
+
+
 
 
       # - name: Automatically create changeset
