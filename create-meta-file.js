@@ -50,6 +50,7 @@ const createMetaFile = () => {
 
     const changesetFilePath = `.changeset/${changesetName}.md`;
     const metaFilePath = `.changeset/${changesetName}.meta.json`;
+    const changesetContent = fs.readFileSync(changesetFilePath, "utf-8");
 
     // Проверяем существование changeset файла
     if (!fs.existsSync(changesetFilePath)) {
