@@ -57,7 +57,7 @@ jobs:
           if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
             echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
           else
-            echo "$CHANGED_FILES="" >> $GITHUB_ENV
+            echo "$CHANGED_FILES=''" >> $GITHUB_ENV
           fi
 
       # 6. Генерация или обновление meta.json для каждого измененного файла
