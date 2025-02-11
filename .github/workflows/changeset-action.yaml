@@ -38,8 +38,11 @@ jobs:
       - name: Check for .changeset/*.md files
         id: check-changeset
         run: |
-          # check if there any changes in .changeset/*.md
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^.changeset/.*\.md$'; then
+          # Get the list of changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+
+          # Check if any .changeset/*.md files are present in the changes
+          if echo "$CHANGED_FILES" | grep -q '^.changeset/.*\.md$'; then
             echo "changeset_files_found=true" >> $GITHUB_ENV
           else
             echo "changeset_files_found=false" >> $GITHUB_ENV
