@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
+
 // Функция для безопасного выполнения команды
 const safeExecSync = (command) => {
     try {
@@ -9,6 +10,22 @@ const safeExecSync = (command) => {
     } catch (error) {
         return "unknown"; // Возвращаем "unknown", если команда не выполнена
     }
+};
+
+// Функция для извлечения номера issue из названия ветки
+const extractIssueNumberFromBranch = () => {
+    const branchName = safeExecSync("git rev-parse --abbrev-ref HEAD");
+    const match = branchName.match(/issue-(\d+)/); // regex for searching "issue-<number>"
+    const issue_number = match && match[1] // "unknown"; // return issue number or "unknown", if no match detected
+    return [issue_number, issue_number ? `https://github.com/AllaYakymova/monorepo-react-template/issues/${issue_number}` : null]
+};
+
+// Функция для извлечения номера PR из коммитов
+const extractPRNumberFromCommits = () => {
+    const logMessage = safeExecSync("git log -1 --pretty=%B"); // Получаем последнее сообщение коммита
+    const match = logMessage.match(/\(#(\d+)\)/); // Регулярное выражение для поиска "(#<PR_number>)"
+    console.log('logMessage ', { match })
+    return match ? match[1] : "unknown"; // Возвращаем номер PR или "unknown", если номер не найден
 };
 
 const createMetaFile = () => {
@@ -27,14 +44,16 @@ const createMetaFile = () => {
                 const [name, type] = line.replace("- ", "").split(": ");
                 return { name, type };
             });
-
+  
         // Получаем автора и коммит безопасно
         const meta = {
             changeset: path.basename(file, ".md"),
             author: safeExecSync("git config user.name"),
             date: new Date().toISOString(),
-            pr_number: process.env.PR_NUMBER || "unknown",
+            pr_number: extractPRNumberFromCommits(),
             commit: safeExecSync("git rev-parse HEAD"),
+            issue_number: extractIssueNumberFromBranch()?.[0], // add issue number
+            issue_ink: extractIssueNumberFromBranch()?.[1],
             description: changesetContent.split("\n\n")[1]?.trim() || "No description",
             packages
         };
