@@ -1,9 +1,9 @@
 {
   "changeset": "lucky-comics-refuse",
-  "date": "2025-02-11T17:10:59.625Z",
-  "pr_number": "30",
-  "issue_number": "444",
-  "issue_ink": "https://github.com/AllaYakymova/monorepo-react-template/issues/444",
+  "date": "2025-02-11T17:32:28.331Z",
+  "pr_number": "31",
+  "issue_number": "567",
+  "issue_ink": "https://github.com/AllaYakymova/monorepo-react-template/issues/567",
   "description": "Main component: added console.log",
   "packages": [
     {
