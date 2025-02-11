@@ -5,12 +5,12 @@
 .clearfix {
   &:before {
     content: " ";
-    display: table;
+    display: table !important;
   }
 
   &:after {
     content: " ";
-    display: table;
+    display: table !important;
     clear: both;
   }
 }
