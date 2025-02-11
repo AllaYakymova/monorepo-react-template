@@ -58,9 +58,9 @@
     "init-manifest": "npx release-please bootstrap --config-file .release-please-config.js --default-branch master --repo-url https://github.com/AllaYakymova/monorepo-react-template --debug",
     "release-pr": "npx release-please release-pr --config-file .release-please-config.js --repo-url https://github.com/AllaYakymova/monorepo-react-template --target-branch master",
     "release-please": "npm run release-pr"
-
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.11",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
