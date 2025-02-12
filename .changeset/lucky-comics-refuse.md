@@ -1,5 +1,4 @@
 ---
-"plugin-1": patch
 "plugin-component": patch
 ---
 

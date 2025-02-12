@@ -9,10 +9,6 @@
     {
       "name": "front-end",
       "type": "patch"
-    },
-    {
-      "name": "monorepo-react-template",
-      "type": "patch"
     }
   ]
 }
