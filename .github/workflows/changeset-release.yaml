@@ -30,6 +30,7 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.CHANGESSETS_PAT }}
+  GITHUB_TOKEN: ${{ secrets.CHANGESETS_PAT }}
 
 jobs:
   create-changeset-meta:
@@ -92,10 +93,21 @@ jobs:
             echo "GH_TOKEN is set."
           fi
 
+      - name: Debug GH_TOKEN in Node
+        run: node -e "console.log('GH_TOKEN:', process.env.GH_TOKEN)"
+
+      - name: Debug Environment Variables
+        run: |
+          echo "GITHUB_TOKEN: $GITHUB_TOKEN"
+          echo "GH_TOKEN: $GH_TOKEN"
+
+      - name: Debug GitHub API request
+        run: |
+          curl-H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user
+
       - name: Run Changeset Version
         run: |
-          echo "GH_TOKEN: $GH_TOKEN"
-          npx changeset version --filter ${{ steps.select-package.outputs.package_name }}
+          DEBUG=changesets:* env GH_TOKEN=$GH_TOKEN npx changeset version --filter ${{ steps.select-package.outputs.package_name }}
 
       # - name: Run Changeset Publish
       #   run: |
