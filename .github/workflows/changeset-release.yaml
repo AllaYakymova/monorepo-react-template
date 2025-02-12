@@ -35,7 +35,12 @@ jobs:
   create-changeset-meta:
     # if: github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: 'write'
+      packages: 'write'
+      actions: 'read'
+      # read: user 
+      # repo: status
     steps:
       # 1. Checkout репозиторий
       - name: Checkout repository
