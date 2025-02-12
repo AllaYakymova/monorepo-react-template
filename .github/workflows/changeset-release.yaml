@@ -7,22 +7,22 @@ on:
         description: 'Node version'
         required: true
         default: '20'
-      relese_front_end:
+      relesae_front_end:
         required: true
         default: 'false'
         type: boolean
         description: 'Release front-end package'
-      relese_plugin_1:
+      release_plugin_1:
         required: true
         default: 'false'
         type: boolean
         description: 'Release plugin_1 package'
-      relese_plugin_component:
+      release_plugin_component:
         required: true
         default: 'false'
         type: boolean
         description: 'Release plugin_component package'
-      relese_root:
+      release_root:
         required: true
         default: 'false'
         type: boolean
@@ -62,7 +62,7 @@ jobs:
           elif [ "${{ inputs.release_root }}" == "true" ]; then
             PACKAGE_NAME="monorepo-react-template"
           fi
-          echo "inputs.release_front_end: ${{ inputs.release_front_end }}"
+          echo "PACKAGE_NAME: $PACKAGE_NAME"
 
           if [ -z "$PACKAGE_NAME" ]; then
             echo "No package selected for release."
