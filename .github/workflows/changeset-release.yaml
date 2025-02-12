@@ -29,7 +29,7 @@ on:
         description: 'Release monorepo-react-template'
 
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
 jobs:
   create-changeset-meta:
@@ -39,8 +39,7 @@ jobs:
       contents: 'write'
       packages: 'write'
       actions: 'read'
-      read: user 
-      repo: status
+     
     steps:
       # 1. Checkout репозиторий
       - name: Checkout repository
@@ -75,7 +74,8 @@ jobs:
             exit 1
           fi
 
-          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+          # echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
 
       # # 3. Установить Git пользователя для действий
       # - name: Set up Git user
@@ -85,7 +85,7 @@ jobs:
 
       - name: Run Changeset Version
         run: |
-          npx changeset version --filter $PACKAGE_NAME
+          npx changeset version --filter ${{ steps.select-package.outputs.package_name }}
 
       # - name: Run Changeset Publish
       #   run: |
