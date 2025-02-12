@@ -30,8 +30,6 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PR_NUMBER: ${{ github.event.pull_request.number }}
-  GITHUB_HEAD_REF: ${{ github.head_ref }}  # Получаем имя ветки PR
 
 jobs:
   create-changeset-meta:
@@ -48,6 +46,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Define package to release
         id: select-package
