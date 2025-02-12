@@ -103,7 +103,7 @@ jobs:
 
       - name: Debug GitHub API request
         run: |
-          curl-H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user
+          curl -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user
 
       - name: Run Changeset Version
         run: |
