@@ -78,7 +78,10 @@ jobs:
           # echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
 
-      # 3. Установить Git пользователя для действий
+      - name: Remove old meta files
+        run: |
+          find . -name "*.meta.json" -exec rm -f {} \;
+
       - name: Set up Git user
         run: |
           git config --global user.name "GitHub Actions Bot"
