@@ -30,7 +30,7 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.CHANGESSETS_PAT }}
-  GITHUB_TOKEN: ${{ secrets.CHANGESETS_PAT }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   create-changeset-meta:
@@ -101,9 +101,13 @@ jobs:
           echo "GITHUB_TOKEN: $GITHUB_TOKEN"
           echo "GH_TOKEN: $GH_TOKEN"
 
-      - name: Debug GitHub API request
+      - name: Debug GitHub GH_TOKEN API request
         run: |
           curl -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user
+
+      - name: Debug GitHub GITHUB_TOKEN API request
+        run: |
+          curl -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user
 
       - name: Run Changeset Version
         run: |
