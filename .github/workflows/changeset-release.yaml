@@ -39,8 +39,8 @@ jobs:
       contents: 'write'
       packages: 'write'
       actions: 'read'
-      # read: user 
-      # repo: status
+      read: user 
+      repo: status
     steps:
       # 1. Checkout репозиторий
       - name: Checkout repository
