@@ -1,0 +1,146 @@
+name: Create Changeset Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      node_version:
+        description: 'Node version'
+        required: true
+        default: '20'
+      relese_front_end:
+        id: front_end
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release front-end package'
+      relese_plugin_1:
+        id: plugin-1
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release plugin_1 package'
+      relese_plugin_component:
+        id: plugin-component
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release plugin_component package'
+      relese_root:
+        id: monorepo-react-template
+        required: true
+        default: 'false'
+        type: boolean
+        description: 'Release monorepo-react-template'
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  GITHUB_HEAD_REF: ${{ github.head_ref }}  # Получаем имя ветки PR
+
+jobs:
+  create-changeset-meta:
+    if: github.ref != 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Установка Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Define package to release
+        id: select-package
+        run: |
+          PACKAGE_NAME=""
+          if [ "${{ inputs.release_front_end }}" == "true" ]; then
+            PACKAGE_NAME="front-end"
+          elif [ "${{ inputs.release_plugin_1 }}" == "true" ]; then
+            PACKAGE_NAME="plugin-1"
+          elif [ "${{ inputs.release_plugin_component }}" == "true" ]; then
+            PACKAGE_NAME="plugin-component"
+          elif [ "${{ inputs.release_root }}" == "true" ]; then
+            PACKAGE_NAME="monorepo-react-template"
+          fi
+
+          if [ -z "$PACKAGE_NAME" ]; then
+            echo "No package selected for release."
+            exit 1
+          fi
+
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+
+      # # 3. Установить Git пользователя для действий
+      # - name: Set up Git user
+      #   run: |
+      #     git config --global user.name "GitHub Actions Bot"
+      #     git config --global user.email "actions@github.com"
+
+      - name: Run Changeset Version
+        run: |
+          npx changeset version --filter $PACKAGE_NAME
+
+      # - name: Run Changeset Publish
+      #   run: |
+      #     npm run changeset-publish
+      
+      
+      
+      # # 4. Извлечение измененных или добавленных .md файлов
+      # - name: Get changed .changeset/*.md files
+      #   id: get-changed-files
+      #   run: |
+      #     # Fetch the base branch to ensure it's available
+      #     git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+      #     git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
+
+      #     # Get the list of changed files between the PR branch and the base branch
+      #     # Получаем измененные файлы между базовой веткой и текущей веткой PR
+      #     CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^\.changeset/[^/]\+\.md$' || echo "")
+
+      #     # Выводим список измененных файлов в лог
+      #     echo "Changed .md files: $CHANGED_FILES"
+
+      #     # Записываем в переменную окружения, если есть измененные файлы
+      #     if [[ -n "$CHANGED_FILES" ]]; then
+      #       # Переводим список файлов в строку через пробел (чтобы избежать ошибок записи в $GITHUB_ENV)
+      #       CHANGED_FILES_FORMATTED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
+      #       echo "CHANGED_MD_FILES=$CHANGED_FILES_FORMATTED" >> $GITHUB_ENV
+      #     else
+      #       echo "CHANGED_MD_FILES=" >> $GITHUB_ENV
+      #     fi
+
+      #  # 5: Генерируем meta.json только для измененных файлов
+      # - name: Generate meta files for changed changesets
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     echo "Changed .md files: $CHANGED_MD_FILES"
+      #     for file in $CHANGED_MD_FILES; do
+      #       echo "Processing $file..."
+      #       # Убираем расширение .md, чтобы получить имя для meta.json
+      #       BASENAME=$(basename "$file" .md)
+      #       node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
+      #     done
+      
+      # # 6: Коммитим и пушим изменения
+      # - name: Commit meta.json file
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git add .changeset/*.meta.json
+      #     git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
+
+      #  # 7. Избежать конфликтов с удаленными изменениями
+      # - name: Pull remote changes (to avoid conflicts)
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git pull --rebase origin ${{ github.head_ref }}
+
+      # # 8. Запушить изменения в PR ветку
+      # - name: Push changes to PR branch
+      #   if: env.CHANGED_MD_FILES != ''
+      #   run: |
+      #     git push origin HEAD:${{ github.head_ref }}
