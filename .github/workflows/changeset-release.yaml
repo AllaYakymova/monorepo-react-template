@@ -33,8 +33,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  create-changeset-meta:
-    # if: github.ref != 'refs/heads/master'
+  create-changeset-release:
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     permissions:
       contents: 'write'
@@ -94,60 +94,3 @@ jobs:
       # - name: Run Changeset Publish
       #   run: |
       #     npm run changeset-publish
-      
-      
-      
-      # # 4. Извлечение измененных или добавленных .md файлов
-      # - name: Get changed .changeset/*.md files
-      #   id: get-changed-files
-      #   run: |
-      #     # Fetch the base branch to ensure it's available
-      #     git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-      #     git fetch origin ${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
-
-      #     # Get the list of changed files between the PR branch and the base branch
-      #     # Получаем измененные файлы между базовой веткой и текущей веткой PR
-      #     CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^\.changeset/[^/]\+\.md$' || echo "")
-
-      #     # Выводим список измененных файлов в лог
-      #     echo "Changed .md files: $CHANGED_FILES"
-
-      #     # Записываем в переменную окружения, если есть измененные файлы
-      #     if [[ -n "$CHANGED_FILES" ]]; then
-      #       # Переводим список файлов в строку через пробел (чтобы избежать ошибок записи в $GITHUB_ENV)
-      #       CHANGED_FILES_FORMATTED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
-      #       echo "CHANGED_MD_FILES=$CHANGED_FILES_FORMATTED" >> $GITHUB_ENV
-      #     else
-      #       echo "CHANGED_MD_FILES=" >> $GITHUB_ENV
-      #     fi
-
-      #  # 5: Генерируем meta.json только для измененных файлов
-      # - name: Generate meta files for changed changesets
-      #   if: env.CHANGED_MD_FILES != ''
-      #   run: |
-      #     echo "Changed .md files: $CHANGED_MD_FILES"
-      #     for file in $CHANGED_MD_FILES; do
-      #       echo "Processing $file..."
-      #       # Убираем расширение .md, чтобы получить имя для meta.json
-      #       BASENAME=$(basename "$file" .md)
-      #       node create-meta-file.js "$BASENAME" # Передаем имя файла без .md в скрипт
-      #     done
-      
-      # # 6: Коммитим и пушим изменения
-      # - name: Commit meta.json file
-      #   if: env.CHANGED_MD_FILES != ''
-      #   run: |
-      #     git add .changeset/*.meta.json
-      #     git commit -m "Add/Update meta.json files for changesets" || echo "No changes to commit"
-
-      #  # 7. Избежать конфликтов с удаленными изменениями
-      # - name: Pull remote changes (to avoid conflicts)
-      #   if: env.CHANGED_MD_FILES != ''
-      #   run: |
-      #     git pull --rebase origin ${{ github.head_ref }}
-
-      # # 8. Запушить изменения в PR ветку
-      # - name: Push changes to PR branch
-      #   if: env.CHANGED_MD_FILES != ''
-      #   run: |
-      #     git push origin HEAD:${{ github.head_ref }}
