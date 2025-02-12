@@ -29,7 +29,7 @@ on:
         description: 'Release monorepo-react-template'
 
 env:
-  GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.CHANGESSETS_PAT }}
 
 jobs:
   create-changeset-meta:
@@ -77,14 +77,24 @@ jobs:
           # echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
 
-      # # 3. Установить Git пользователя для действий
-      # - name: Set up Git user
-      #   run: |
-      #     git config --global user.name "GitHub Actions Bot"
-      #     git config --global user.email "actions@github.com"
+      # 3. Установить Git пользователя для действий
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Debug GH_TOKEN
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_TOKEN is empty!"
+            exit 1
+          else
+            echo "GH_TOKEN is set."
+          fi
 
       - name: Run Changeset Version
         run: |
+          echo "GH_TOKEN: $GH_TOKEN"
           npx changeset version --filter ${{ steps.select-package.outputs.package_name }}
 
       # - name: Run Changeset Publish
