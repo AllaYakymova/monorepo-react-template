@@ -2,4 +2,4 @@
 "plugin-1": patch
 ---
 
-[Fix]: [Component] clean-up dead code
+Fixed: **Component**: clean-up dead code

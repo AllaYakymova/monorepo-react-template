@@ -2,4 +2,4 @@
 "plugin-1": patch
 ---
 
-[Chore]: [Component]: add comment
+Chore: add comment
