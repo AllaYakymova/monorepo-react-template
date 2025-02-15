@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "plugin-component",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "plugin-component in monorepo",
     "main": "./dist/app.js",
     "keywords": [],
