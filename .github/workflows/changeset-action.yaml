@@ -1,15 +1,15 @@
 name: Create Changeset Meta File
 
 on:
-  pull_request:
-    types:
-      - opened
-      # - edited
-      - reopened
-      - synchronize
-      - ready_for_review
-    paths:
-      - ".changeset/*.md"  # Следим за изменениями только в .md файлах в .changeset/
+  # pull_request:
+  #   types:
+  #     - opened
+  #     # - edited
+  #     - reopened
+  #     - synchronize
+  #     - ready_for_review
+  #   paths:
+  #     - ".changeset/*.md"  # Следим за изменениями только в .md файлах в .changeset/
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
