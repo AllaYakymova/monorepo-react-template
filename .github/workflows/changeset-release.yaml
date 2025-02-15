@@ -87,18 +87,18 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Run Changeset Version
-        run: |
-          DEBUG=changesets:* env GH_TOKEN=$GH_TOKEN npx changeset version --filter ${{ steps.select-package.outputs.package_name }} --exact
-          git add .
-          git commit -m "chore: update changelog and version for ${{ steps.select-package.outputs.package_name }}"
-          git push origin ${{ github.head_ref }}
+      # - name: Run Changeset Version
+      #   run: |
+      #     DEBUG=changesets:* env GH_TOKEN=$GH_TOKEN npx changeset version --filter ${{ steps.select-package.outputs.package_name }} --exact
+      #     git add .
+      #     # git commit -m "chore: update changelog and version for ${{ steps.select-package.outputs.package_name }}"
+      #     # git push origin ${{ github.head_ref }}
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       # - name: Run Changeset Publish
       #   run: |
       #     npm run changeset-publish
