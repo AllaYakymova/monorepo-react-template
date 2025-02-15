@@ -20,6 +20,7 @@ import { getInfo, getInfoFromPullRequest } from '@changesets/get-github-info';
 config();
 
 function validate(options: Record<string, any> | null) {
+    console.log({ options })
     if (!options || !options.repo) {
         throw new Error(
             'Please provide a repo to this changelog generator like this:\n"changelog": ["@svitejs/changesets-changelog-github-compact", { "repo": "org/repo" }]'
@@ -29,6 +30,7 @@ function validate(options: Record<string, any> | null) {
 
 const changelogFunctions: ChangelogFunctions = {
     getDependencyReleaseLine: async (changesets, dependenciesUpdated, options) => {
+        console.log({ changesets, dependenciesUpdated, options })
         validate(options);
         if (dependenciesUpdated.length === 0) return '';
 
