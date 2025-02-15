@@ -40,7 +40,8 @@ jobs:
       contents: 'write'
       packages: 'write'
       actions: 'read'
-     
+      pull-requests: 'write'
+
     steps:
       # 1. Checkout репозиторий
       - name: Checkout repository
@@ -98,6 +99,7 @@ jobs:
         uses: changesets/action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GH_TOKEN: ${{ secrets.CHANGESSETS_PAT }}
 
       # - name: Run Changeset Publish
       #   run: |
