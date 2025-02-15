@@ -284,6 +284,11 @@ jobs:
         run: |
           git push origin HEAD
 
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # # 6.2 Создать релиз для root, если есть изменения
       # - name: Create GitHub Release for root
       #   if: env.changes == 'true'
