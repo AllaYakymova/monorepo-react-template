@@ -14,6 +14,7 @@
 .next/
 out/
 
+.env
 
 # misc
 .DS_Store
