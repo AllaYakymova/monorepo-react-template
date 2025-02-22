@@ -2,7 +2,7 @@ name: Create Issue Reference in PR Template
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types: [opened, synchronize] # edited,
 
 jobs:
   update-template:
@@ -12,68 +12,76 @@ jobs:
       pull-requests: write
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
     - name: Extract issue number from branch name
+      env:
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
-        if [[ "$BRANCH_NAME" =~ issue-([0-9]+)/.*$ ]]; then
-          ISSUE_NUMBER="${BASH_REMATCH[1]}"
+        # accept 
+        # `issue-123/*`, 
+        # `issue_123/*`, 
+        # `*/issue-123/*`, 
+        # `*/issue_123/*`
+        if [[ "$BRANCH_NAME" =~ (issue[-_])([0-9]+) ]]; then
+          ISSUE_NUMBER="${BASH_REMATCH[2]}"
         else
           ISSUE_NUMBER=""
         fi
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
+        echo "ISSUE_NUMBER: $ISSUE_NUMBER"
 
     - name: Update pull request template
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ env.GITHUB_TOKEN }}
-        script: |
-          // get issue number, link and PR number from context
-          const issueNumber = process.env.ISSUE_NUMBER;
-          const prNumber = context.payload.pull_request.number;
-          const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
-          const token = process.env.GITHUB_TOKEN;
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        ISSUE_NUMBER="${ISSUE_NUMBER}"
+        PR_NUMBER="${PR_NUMBER}"
+        REPO_OWNER="${GITHUB_REPOSITORY_OWNER}"
+        REPO_NAME="${GITHUB_REPOSITORY#*/}"
+        GITHUB_TOKEN="${GITHUB_TOKEN}"
 
-          console.log('PR Context: ', context)
+        # if ISSUE_NUMBER is empty, skip PR update
+        if [ -z "$ISSUE_NUMBER" ]; then
+          echo "No issue number found. Skipping PR update."
+          exit 0
+        fi
 
-          // get PR body
-          const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
-          const prResponse = await fetch(prUrl, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/vnd.github.v3+json',
-            },
-          });
+        PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
 
-          if (!prResponse.ok) {
-            throw new Error(`Failed to fetch PR: ${prResponse.statusText}`);
-          }
+        echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
-          const pullRequest = await prResponse.json();
+        # Get the current PR body (remove any possible \r in the output)
+        PR_BODY=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                        -H "Accept: application/vnd.github.v3+json" \
+                        "${PR_URL}" | jq -r '.body' | sed 's/\r$//')
 
-          // Uodate PR body
-          const updatedBody = pullRequest.body.replace(
-            '<!-- ISSUE_LINK -->',
-            issueNumber ? `[#${issueNumber}](${issueLink})` : ''
-          );
+        if [ -z "$PR_BODY" ] || [ "$PR_BODY" == "null" ]; then
+          echo "Error: Unable to fetch PR body or PR not found."
+          exit 1
+        fi
 
-          // Отправляем обновленное описание PR
-          const updatePrResponse = await fetch(prUrl, {
-            method: 'PATCH',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ body: updatedBody }),
-          });
+        # Skip PR body update if <!-- ISSUE_LINK --> not found
+        if ! echo "$PR_BODY" | grep -q "<!-- ISSUE_LINK -->"; then
+          echo "No <!-- ISSUE_LINK --> found in PR body. Skipping update."
+          exit 0
+        fi
 
-          if (!updatePrResponse.ok) {
-            throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
-          }
-          console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
-        
+        ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
+
+         # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
+        UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|[#${ISSUE_NUMBER}](${ISSUE_LINK})|")
+
+        # Update PR body with GH API
+        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${PR_URL}" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            --data "$(jq -n --arg body "$UPDATED_BODY" '$body | gsub("\r"; "") | {body: .}')" )
+
+        if [ "$RESPONSE" -ne 200 ]; then
+          echo "Error: Failed to update PR. HTTP Status: $RESPONSE"
+          exit 1
+        fi
+
+        echo "PR #${PR_NUMBER} updated successfully with issue link: ${ISSUE_LINK}"
