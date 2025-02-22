@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.5/schema.json",
   "changelog": [
-    "./changelog.style.js",
+    "./changelog-format.js",
     {
       "repo": "AllaYakymova/monorepo-react-template",
       "customChangelogFile": "CHANGELOG.md",
