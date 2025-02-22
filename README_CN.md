@@ -3,6 +3,7 @@
 基于 Lerna 的单一存储库示例，它创建了一个用于管理和发布多个包的现代构建系统。
 
 ---
+some changes in the root
 
 - [English](README.md)
 - [中文](README_CN.md)
