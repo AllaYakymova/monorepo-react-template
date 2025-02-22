@@ -32,7 +32,7 @@ jobs:
 
     - name: Update pull request template
       env:
-        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
       #   # PR_URL: ${{ github.event.pull_request.html_url }}
       #   GITHUB_HEAD_REF: ${{ github.head_ref }}
