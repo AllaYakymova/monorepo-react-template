@@ -23,7 +23,7 @@ jobs:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
-        if [[ "$BRANCH_NAME" =~ issue[-_]([0-9]+) ]]; then
+        if [[ "$BRANCH_NAME" =~ issue[-_]([0-9]+)/.*$ ]]; then
           ISSUE_NUMBER="${BASH_REMATCH[2]}"
         else
           ISSUE_NUMBER=""
