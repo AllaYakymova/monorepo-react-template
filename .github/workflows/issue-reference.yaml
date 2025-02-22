@@ -32,8 +32,6 @@ jobs:
         PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       # uses: actions/github-script@v6
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         # Получаем переменные из окружения
         ISSUE_NUMBER="${ISSUE_NUMBER}"
