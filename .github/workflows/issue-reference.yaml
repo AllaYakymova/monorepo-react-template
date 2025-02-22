@@ -29,7 +29,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        PR_URL: ${{ github.event.pull_request.html_url }}
+        # PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       # uses: actions/github-script@v6
       run: |
@@ -42,7 +42,7 @@ jobs:
         PR_URL="${PR_URL}"
         PR_NUMBER="${PR_NUMBER}"
         ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
-        # PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
+        PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         # Логируем переменные
         echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
