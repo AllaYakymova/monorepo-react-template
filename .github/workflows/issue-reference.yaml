@@ -31,10 +31,10 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_HEAD_REF: ${{ github.head_ref }}
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ env.GITHUB_TOKEN }}
-        script: |
+      # uses: actions/github-script@v6
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        run: |
           # Получаем переменные из окружения
           ISSUE_NUMBER="${ISSUE_NUMBER}"
           PR_NUMBER="${PR_NUMBER}"
@@ -42,10 +42,10 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           GITHUB_TOKEN="${GITHUB_TOKEN}"
           PR_URL="${PR_URL}"
-
+          PR_NUMBER="${PR_NUMBER}"
           ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
           # PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
-
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
           # Логируем переменные
           echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
@@ -76,6 +76,52 @@ jobs:
           fi
 
           echo "PR #${PR_NUMBER} updated successfully with issue link: ${ISSUE_LINK}"
+          
+          //////
+          # // get issue number, link and PR number from context
+          # const issueNumber = process.env.ISSUE_NUMBER;
+          # const prNumber = context.payload.pull_request.number;
+          # const issueLink = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/${issueNumber}`;
+          # const token = process.env.GITHUB_TOKEN;
+
+          # console.log('PR Context: ', context)
+
+          # // get PR body
+          # const prUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/pulls/${prNumber}`;
+          # const prResponse = await fetch(prUrl, {
+          #   headers: {
+          #     Authorization: `Bearer ${token}`,
+          #     Accept: 'application/vnd.github.v3+json',
+          #   },
+          # });
+
+          # Получаем текущее тело PR
+          PR_BODY=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                          -H "Accept: application/vnd.github.v3+json" \
+                          "${PR_URL}" | jq -r '.body')
+          # const pullRequest = await prResponse.json();
+          if [ -z "$PR_BODY" ] || [ "$PR_BODY" == "null" ]; then
+          # // Uodate PR body
+          # const updatedBody = pullRequest.body.replace(
+          #   '<!-- ISSUE_LINK -->',
+          #   issueNumber ? `[#${issueNumber}](${issueLink})` : ''
+          # );
+          UPDATED_BODY=$(echo "$PR_BODY" | jq -R --arg issueLink "${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}" \
+          # // Отправляем обновленное описание PR
+          # const updatePrResponse = await fetch(prUrl, {
+          #   method: 'PATCH',
+          #   headers: {
+          #     Authorization: `Bearer ${token}`,
+          #     Accept: 'application/vnd.github.v3+json',
+          #     'Content-Type': 'application/json',
+          #   },
+          #   body: JSON.stringify({ body: updatedBody }),
+          # });
+            echo "Error: Failed to update PR. HTTP Status: $RESPONSE"
+          # if (!updatePrResponse.ok) {
+          #   throw new Error(`Failed to update PR: ${updatePrResponse.statusText}`);
+          # }
+          # console.log(`PR #${prNumber} updated with a linked issue ${issueLink} successfully.`);
           
           //////
           # // get issue number, link and PR number from context
