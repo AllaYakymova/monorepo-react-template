@@ -4,7 +4,6 @@
     "./changelog-format.js",
     {
       "repo": "AllaYakymova/monorepo-react-template",
-      "customChangelogFile": "CHANGELOG.md",
       "packages": [
         {
           "name": "front-end",
@@ -17,10 +16,6 @@
         {
           "name": "plugin-component",
           "changelog": "packages/plugin-component/CHANGELOG.md"
-        },
-        {
-          "name": "monorepo-react-template",
-          "changelog": "CHANGELOG.md"
         }
       ]
     }
