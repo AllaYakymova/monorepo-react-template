@@ -7,7 +7,7 @@ const { getInfo, getInfoFromPullRequest } = require('@changesets/get-github-info
 /**
  * @type {Array<string | undefined>}
  */
-const CHANGESET_SECTIONS = ['Removed', 'Changed', 'Deprecated', 'Added', 'Fix', 'Chore'];
+const CHANGESET_SECTIONS = ['Removed', 'Changed', 'Deprecated', 'Added', 'Fixed', 'Chore'];
 
 const changesetSectionReg = new RegExp(`^- (${CHANGESET_SECTIONS.join('|')}): `);
 
@@ -47,6 +47,9 @@ const changelogFunctions = {
                     : CHANGESET_SECTIONS.indexOf(aSection) - CHANGESET_SECTIONS.indexOf(bSection);
             });
     },
+   
+   
+   
     async getReleaseLine(changeset, _type, options) {
         if (!options || !options.repo) {
             throw new Error(
@@ -139,9 +142,20 @@ const changelogFunctions = {
 
         return line ? `- ${line}.` : '';
     },
-    async getDependencyReleaseLine() {
-        return '';
-    },
+    // async getDependencyReleaseLine() {
+    //     return '';
+    // },
+    /**
+     * @type {import('@changesets/types').GetDependencyReleaseLine}
+     */
+    async getDependencyReleaseLine (changesets, dependenciesUpdated, changelogOpts) {
+        if (dependenciesUpdated.length === 0) return "";
+
+        const updatedDependenciesList = dependenciesUpdated.map(
+            (dependency) => `- ${dependency.name}@${dependency.newVersion}`
+        );
+        return `\n### Dependency Updates\n\n${updatedDependenciesList.join("\n")}`;
+    }
 };
 
 module.exports = changelogFunctions;

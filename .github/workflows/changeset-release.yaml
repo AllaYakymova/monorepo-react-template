@@ -34,7 +34,7 @@ env:
 
 jobs:
   create-changeset-release:
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release')
     runs-on: ubuntu-latest
     permissions:
       contents: 'write'
@@ -56,32 +56,32 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Define package to release
-        id: select-package
-        run: |
-          PACKAGE_NAME=""
-          if [ "${{ inputs.release_front_end }}" == "true" ]; then
-            PACKAGE_NAME="front-end"
-          elif [ "${{ inputs.release_plugin_1 }}" == "true" ]; then
-            PACKAGE_NAME="plugin-1"
-          elif [ "${{ inputs.release_plugin_component }}" == "true" ]; then
-            PACKAGE_NAME="plugin-component"
-          elif [ "${{ inputs.release_root }}" == "true" ]; then
-            PACKAGE_NAME="monorepo-react-template"
-          fi
-          echo "PACKAGE_NAME: $PACKAGE_NAME"
+      # - name: Define package to release
+      #   id: select-package
+      #   run: |
+      #     PACKAGE_NAME=""
+      #     if [ "${{ inputs.release_front_end }}" == "true" ]; then
+      #       PACKAGE_NAME="front-end"
+      #     elif [ "${{ inputs.release_plugin_1 }}" == "true" ]; then
+      #       PACKAGE_NAME="plugin-1"
+      #     elif [ "${{ inputs.release_plugin_component }}" == "true" ]; then
+      #       PACKAGE_NAME="plugin-component"
+      #     elif [ "${{ inputs.release_root }}" == "true" ]; then
+      #       PACKAGE_NAME="monorepo-react-template"
+      #     fi
+      #     echo "PACKAGE_NAME: $PACKAGE_NAME"
 
-          if [ -z "$PACKAGE_NAME" ]; then
-            echo "No package selected for release."
-            exit 1
-          fi
+      #     if [ -z "$PACKAGE_NAME" ]; then
+      #       echo "No package selected for release."
+      #       exit 1
+      #     fi
 
-          # echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
-          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+      #     # echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+      #     echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
 
-      - name: Remove old meta files
-        run: |
-          find . -name "*.meta.json" -exec rm -f {} \;
+      # - name: Remove old meta files
+      #   run: |
+      #     find . -name "*.meta.json" -exec rm -f {} \;
 
       - name: Set up Git user
         run: |

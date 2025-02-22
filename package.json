@@ -54,7 +54,7 @@
     "changeset": "npx changeset",
     "add-changeset": "npx changeset && node create-meta-file.js",
     "meta-file": "node create-meta-file.js",
-    "changeset-version": "npx changeset version",
+    "changeset-version": "changeset version && node .changeset/post-format.js",
     "changeset-publish": "npx changeset publish",
     "version": "npm run changeset-version && npm run changeset-publish",
     "release": "lerna run version --yes && lerna publish from-package --yes",
