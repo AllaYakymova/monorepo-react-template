@@ -1,7 +1,29 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.5/schema.json",
   "changelog": [
-    "./changelog-format.js"
+    "./changelog-format.js",
+    {
+      "repo": "AllaYakymova/monorepo-react-template",
+      "customChangelogFile": "CHANGELOG.md",
+      "packages": [
+        {
+          "name": "front-end",
+          "changelog": "packages/front-end/CHANGELOG.md"
+        },
+        {
+          "name": "@plugin-1",
+          "changelog": "packages/plugin-1/CHANGELOG.md"
+        },
+        {
+          "name": "plugin-component",
+          "changelog": "packages/plugin-component/CHANGELOG.md"
+        },
+        {
+          "name": "monorepo-react-template",
+          "changelog": "./CHANGELOG.md"
+        }
+      ]
+    }
   ],
   "commit": false,
   "fixed": [],
@@ -12,24 +34,5 @@
   "ignore": [],
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "updateInternalDependents": "always"
-  },
-  "changelogOptions": {
-    "repo": "AllaYakymova/monorepo-react-template",
-    "releaseType": "github",
-    "filename": "CHANGELOG.md",
-    "packages": [
-      {
-        "name": "front-end",
-        "changelog": "packages/front-end/CHANGELOG.md"
-      },
-      {
-        "name": "plugin-1",
-        "changelog": "packages/plugin-1/CHANGELOG.md"
-      },
-      {
-        "name": "plugin-2",
-        "changelog": "packages/plugin-2/CHANGELOG.md"
-      }
-    ]
   }
 }
