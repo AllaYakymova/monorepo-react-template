@@ -2,7 +2,7 @@ name: Create Issue Reference in PR Template
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types: [opened, synchronize] # edited,
 
 jobs:
   update-template:
@@ -17,7 +17,7 @@ jobs:
 
     - name: Extract issue number from branch name
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # PR_NUMBER: ${{ github.event.pull_request.number }}
         # PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_HEAD_REF: ${{ github.head_ref }}
@@ -32,11 +32,11 @@ jobs:
 
     - name: Update pull request template
       env:
-        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # PR_NUMBER: ${{ github.event.pull_request.number }}
-      #   # PR_URL: ${{ github.event.pull_request.html_url }}
-      #   GITHUB_HEAD_REF: ${{ github.head_ref }}
-      # uses: actions/github-script@v6
+        #   # PR_URL: ${{ github.event.pull_request.html_url }}
+        #   GITHUB_HEAD_REF: ${{ github.head_ref }}
+        # uses: actions/github-script@v6
       run: |
         # Получаем переменные из окружения
         ISSUE_NUMBER="${ISSUE_NUMBER}"
