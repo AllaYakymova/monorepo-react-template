@@ -12,14 +12,11 @@ jobs:
       pull-requests: write
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    # - name: Checkout repository
+    #   uses: actions/checkout@v3
 
     - name: Extract issue number from branch name
       env:
-        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # PR_NUMBER: ${{ github.event.pull_request.number }}
-        # PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
@@ -63,10 +60,7 @@ jobs:
         # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
         UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}|")
 
-        # Remove possible \r
-        # UPDATED_BODY=$(echo "$UPDATED_BODY" | sed 's/\r$//')
-
-        # Update PR body via API
+        # Update PR body with GH API
         RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${PR_URL}" \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
