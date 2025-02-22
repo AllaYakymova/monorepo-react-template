@@ -30,8 +30,10 @@
     }
   },
   "workspaces": [
-    ".",
-    "packages/*"
+    "",
+    "packages/front-end",
+    "packages/plugin-1",
+    "packages/plugin-component"
   ],
   "auto-changelog": {
     "output": "CHANGELOG.md",
