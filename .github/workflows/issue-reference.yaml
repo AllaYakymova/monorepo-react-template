@@ -28,6 +28,7 @@ jobs:
           ISSUE_NUMBER=""
         fi
         echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
+        echo "ISSUE_NUMBER: $ISSUE_NUMBER"
 
     - name: Update pull request template
       env:
