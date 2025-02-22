@@ -39,11 +39,11 @@ jobs:
         REPO_OWNER="${GITHUB_REPOSITORY_OWNER}"
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         GITHUB_TOKEN="${GITHUB_TOKEN}"
-        PR_URL="${PR_URL}"
+        # PR_URL="${PR_URL}"
         PR_NUMBER="${PR_NUMBER}"
         ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
         PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
-        REPO_NAME="${GITHUB_REPOSITORY#*/}"
+
         # Логируем переменные
         echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
@@ -57,25 +57,24 @@ jobs:
           exit 1
         fi
 
-        # Обновляем тело PR, заменяя <!-- ISSUE_LINK --> на ссылку на issue
-        UPDATED_BODY=$(echo "$PR_BODY" | jq -R --arg issueLink "${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}" \
-          'gsub("<!-- ISSUE_LINK -->"; $issueLink)')
+        # Обновляем тело PR, заменяя только <!-- ISSUE_LINK -->
+        UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}|")
 
         # Обновляем PR через API
         RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${PR_URL}" \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            --data "$(jq -n --arg body "$UPDATED_BODY" '{body: $body}')")
+            --data "$(jq -n --arg body "$UPDATED_BODY" '{body: $body}')" )
 
         if [ "$RESPONSE" -ne 200 ]; then
-          echo "Error: Failed to update PR. HTTP Status: $RESPONSE"
-          exit 1
-        fi
+            echo "Error: Failed to update PR. HTTP Status: $RESPONSE"
+            exit 1
+          fi
 
-        echo "PR #${PR_NUMBER} updated successfully with issue link: ${ISSUE_LINK}"
+          echo "PR #${PR_NUMBER} updated successfully with issue link: ${ISSUE_LINK}"
           
-          //////
+          # //////
           # // get issue number, link and PR number from context
           # const issueNumber = process.env.ISSUE_NUMBER;
           # const prNumber = context.payload.pull_request.number;
