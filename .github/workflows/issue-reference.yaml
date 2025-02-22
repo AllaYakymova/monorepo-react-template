@@ -40,8 +40,15 @@ jobs:
         REPO_OWNER="${GITHUB_REPOSITORY_OWNER}"
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         GITHUB_TOKEN="${GITHUB_TOKEN}"
-        ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
         PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
+
+        # Если ISSUE_NUMBER пуст, пропускаем обновление PR
+        if [ -z "$ISSUE_NUMBER" ]; then
+          echo "No issue number found. Skipping PR update."
+          exit 0
+        fi
+
+        ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
 
         echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
@@ -55,8 +62,14 @@ jobs:
           exit 1
         fi
 
-        # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
-        UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}|")
+        # Skip PR body update if <!-- ISSUE_LINK --> not found
+        if ! echo "$PR_BODY" | grep -q "<!-- ISSUE_LINK -->"; then
+          echo "No <!-- ISSUE_LINK --> found in PR body. Skipping update."
+          exit 0
+        fi
+
+         # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
+        UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|[#${ISSUE_NUMBER}](${ISSUE_LINK})|")
 
         # Update PR body with GH API
         RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${PR_URL}" \
