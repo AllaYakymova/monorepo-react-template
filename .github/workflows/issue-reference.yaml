@@ -12,9 +12,6 @@ jobs:
       pull-requests: write
 
     steps:
-    # - name: Checkout repository
-    #   uses: actions/checkout@v3
-
     - name: Extract issue number from branch name
       env:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
