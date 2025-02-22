@@ -23,6 +23,11 @@ jobs:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         BRANCH_NAME="${GITHUB_HEAD_REF}"
+        # accept 
+        # `issue-123/*`, 
+        # `issue_123/*`, 
+        # `*/issue-123/*`, 
+        # `*/issue_123/*`
         if [[ "$BRANCH_NAME" =~ (issue[-_])([0-9]+) ]]; then
           ISSUE_NUMBER="${BASH_REMATCH[2]}"
         else
@@ -34,11 +39,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        #   # PR_URL: ${{ github.event.pull_request.html_url }}
-        #   GITHUB_HEAD_REF: ${{ github.head_ref }}
-        # uses: actions/github-script@v6
       run: |
-        # Получаем переменные из окружения
         ISSUE_NUMBER="${ISSUE_NUMBER}"
         PR_NUMBER="${PR_NUMBER}"
         REPO_OWNER="${GITHUB_REPOSITORY_OWNER}"
@@ -47,10 +48,9 @@ jobs:
         ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
         PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
 
-        # Логируем переменные
         echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
-        # Получаем текущее тело PR (убираем возможные \r в выводе)
+        # Get the current PR body (remove any possible \r in the output)
         PR_BODY=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                         -H "Accept: application/vnd.github.v3+json" \
                         "${PR_URL}" | jq -r '.body' | sed 's/\r$//')
@@ -60,13 +60,13 @@ jobs:
           exit 1
         fi
 
-        # Обновляем тело PR, заменяя только <!-- ISSUE_LINK -->
+        # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
         UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|${ISSUE_NUMBER:+[#${ISSUE_NUMBER}](${ISSUE_LINK})}|")
 
-        # Убираем возможные \r перед отправкой
-        UPDATED_BODY=$(echo "$UPDATED_BODY" | sed 's/\r$//')
+        # Remove possible \r
+        # UPDATED_BODY=$(echo "$UPDATED_BODY" | sed 's/\r$//')
 
-        # Обновляем PR через API, корректно передавая данные без \r
+        # Update PR body via API
         RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${PR_URL}" \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
