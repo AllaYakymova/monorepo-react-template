@@ -40,15 +40,14 @@ jobs:
         REPO_OWNER="${GITHUB_REPOSITORY_OWNER}"
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         GITHUB_TOKEN="${GITHUB_TOKEN}"
-        PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
 
-        # Если ISSUE_NUMBER пуст, пропускаем обновление PR
+        # if ISSUE_NUMBER is empty, skip PR update
         if [ -z "$ISSUE_NUMBER" ]; then
           echo "No issue number found. Skipping PR update."
           exit 0
         fi
 
-        ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
+        PR_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${PR_NUMBER}"
 
         echo "Fetching PR #${PR_NUMBER} from ${REPO_OWNER}/${REPO_NAME}"
 
@@ -67,6 +66,8 @@ jobs:
           echo "No <!-- ISSUE_LINK --> found in PR body. Skipping update."
           exit 0
         fi
+
+        ISSUE_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}"
 
          # Update PR body, inserting issue number instead of comment <!-- ISSUE_LINK -->
         UPDATED_BODY=$(echo "$PR_BODY" | sed "s|<!-- ISSUE_LINK -->|[#${ISSUE_NUMBER}](${ISSUE_LINK})|")
