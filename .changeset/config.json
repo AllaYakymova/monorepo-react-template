@@ -45,7 +45,7 @@
         "changelog": "packages/front-end/CHANGELOG.md"
       },
       {
-        "name": "plugin-1",
+        "name": "@plugin-1",
         "changelog": "packages/plugin-1/CHANGELOG.md"
       },
       {
@@ -54,7 +54,7 @@
       },
       {
         "name": "monorepo-react-template",
-        "changelog": "CHANGELOG.md"
+        "changelog": "./CHANGELOG.md"
       }
     ]
   }
